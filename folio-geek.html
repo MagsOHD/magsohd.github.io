@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas Bracq - Développeur Fullstack | Terminal Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00ff41;
+            --secondary: #39ff14;
+            --accent: #ff0080;
+            --bg: #0a0e27;
+            --bg-light: #1a1e3a;
+            --text: #b8bcc8;
+        }
+        
+        body {
+            font-family: 'Fira Code', monospace;
+            background: var(--bg);
+            color: var(--text);
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 65, 0.03) 2px,
+                    rgba(0, 255, 65, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .matrix-bg::before {
+            content: '010101001110101010101011101010101010111010101010101110101010101011101010101010111010101010101110101010101011101010101010111010101010101110101010101011101010101010111010';
+            position: absolute;
+            font-size: 20px;
+            color: var(--primary);
+            animation: matrix 20s linear infinite;
+            white-space: pre;
+            line-height: 20px;
+        }
+        
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-light) 100%);
+            border: 1px solid var(--primary);
+            position: relative;
+            z-index: 10;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.5),
+                inset 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-btn.red { background: #ff5f56; }
+        .terminal-btn.yellow { background: #ffbd2e; }
+        .terminal-btn.green { background: #27c93f; }
+        
+        .terminal-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--primary);
+            font-size: 0.9em;
+        }
+        
+        header {
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--primary);
+        }
+        
+        .ascii-art {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--primary);
+            font-size: 0.7em;
+            line-height: 1;
+            margin-bottom: 20px;
+            white-space: pre;
+            opacity: 0.8;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            text-shadow: 
+                0 0 10px rgba(0, 255, 65, 0.8),
+                0 0 20px rgba(0, 255, 65, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .typing-effect {
+            color: var(--secondary);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        
+        .typing-effect::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .system-info {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border: 1px solid var(--primary);
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        
+        .system-info div {
+            margin: 5px 0;
+        }
+        
+        .prompt {
+            color: var(--primary);
+        }
+        
+        .command {
+            color: var(--secondary);
+        }
+        
+        .output {
+            color: var(--text);
+            margin-left: 20px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+        
+        h2 {
+            color: var(--primary);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--primary);
+            position: relative;
+        }
+        
+        h2::before {
+            content: '$ ';
+            color: var(--accent);
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100px;
+            height: 1px;
+            background: var(--accent);
+            animation: scan 2s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(300px); }
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            font-size: 0.95em;
+        }
+        
+        .code-block::before {
+            content: '>';
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            color: var(--accent);
+            animation: blink 1s infinite;
+        }
+        
+        .function-name {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .parameters {
+            color: var(--secondary);
+        }
+        
+        .comment {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .experience-item {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .date {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .position {
+            color: var(--primary);
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+        
+        .company {
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .tech-stack {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .skill-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .skill-node {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary);
+            padding: 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .skill-node:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .skill-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .skill-node:hover::before {
+            left: 100%;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.8);
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 100%;
+            background: white;
+            animation: loading 1s linear infinite;
+        }
+        
+        @keyframes loading {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .education-item, .association-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .hobbies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .hobby-tag {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--primary);
+            padding: 8px 15px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .hobby-tag:hover {
+            background: rgba(0, 255, 65, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .binary-decoration {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.1;
+            font-size: 0.8em;
+            color: var(--primary);
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .container {
+                border: 1px solid black;
+                box-shadow: none;
+            }
+            .code-block, .education-item, .association-item {
+                border: 1px solid #333;
+                background: #f5f5f5 !important;
+            }
+            h1, h2, .position {
+                color: #333 !important;
+            }
+            .matrix-bg, body::before {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .skill-matrix {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    
+    <div class="container">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <div class="terminal-btn red"></div>
+                <div class="terminal-btn yellow"></div>
+                <div class="terminal-btn green"></div>
+            </div>
+            <div class="terminal-title">lucas@bracq:~/portfolio/cv.sh</div>
+        </div>
+        
+        <header>
+            <div class="ascii-art">
+ _     _   _  ____    _    ____  
+| |   | | | |/ ___|  / \  / ___| 
+| |   | | | | |     / _ \ \___ \ 
+| |___| |_| | |___ / ___ \ ___) |
+|_____|\___/ \____/_/   \_\____/ 
+            </div>
+            
+            <h1>&lt;Lucas_Bracq/&gt;</h1>
+            <div class="typing-effect">Fullstack Developer | Code Architect | Tech Enthusiast</div>
+            
+            <div class="system-info">
+                <div><span class="prompt">$</span> <span class="command">whoami</span></div>
+                <div class="output">→ Développeur Web Fullstack en recherche de CDI</div>
+                
+                <div><span class="prompt">$</span> <span class="command">cat contact.json</span></div>
+                <div class="output">{</div>
+                <div class="output">  "phone": "07.83.31.30.81",</div>
+                <div class="output">  "email": "lucas.bracq.pro@gmail.com",</div>
+                <div class="output">  "location": "173 Avenue de la plage, 06190 Roquebrune Cap-Martin",</div>
+                <div class="output">  "transport": "Permis B, Véhiculé",</div>
+                <div class="output">  "linkedin": "Lucas 'Mags' Bracq"</div>
+                <div class="output">}</div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <section>
+                    <h2>git log --work-experience</h2>
+                    
+                    <div class="code-block">
+                        <div class="experience-item">
+                            <div class="date">// Octobre 2023 - Aujourd'hui</div>
+                            <div class="position">function DeveloppeurFullstack_PHP() {</div>
+                            <div class="company">  const company = "CruiseTech SARL - Monaco";</div>
+                            <div class="description">
+                                  // Optimisation des performances: -30% temps de chargement<br>
+                                  // Refactoring architecture legacy → moderne<br>
+                                  // Stack: [HTML, CSS, PHP, JavaScript, Symfony, SQL]<br>
+                            }</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-block">
+                        <div class="experience-item">
+                            <div class="date">// Novembre 2022 - Septembre 2023</div>
+                            <div class="position">function AlternantDev_Web() {</div>
+                            <div class="company">  const company = "CodeRhapsodie - Lyon/Remote";</div>
+                            <div class="description">
+                                  // Développement solutions Symfony & EZPublish<br>
+                                  // Contribution projets open source<br>
+                                  // Technologies: [HTML, CSS, PHP, JavaScript]<br>
+                            }</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-block">
+                        <div class="experience-item">
+                            <div class="date">// Octobre 2021 - Mars 2022</div>
+                            <div class="position">function AlternantDev() {</div>
+                            <div class="company">  const company = "Silamir - Rennes";</div>
+                            <div class="description">
+                                  // Migration Bitrix → New Stack<br>
+                                  // Performance boost: +10%<br>
+                                  // Modernisation architecture<br>
+                            }</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-block">
+                        <div class="experience-item">
+                            <div class="date">// Mars 2021 - Juin 2021</div>
+                            <div class="position">function StagiaireDev() {</div>
+                            <div class="company">  const company = "Depiltech - Nice";</div>
+                            <div class="description">
+                                  // Amélioration site principal<br>
+                                  // Développement features back-office<br>
+                                  // Framework: Symfony<br>
+                            }</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 30px;">
+                    <h2>./associations --list</h2>
+                    
+                    <div class="association-item">
+                        <div class="date">/* 2021-2023 */</div>
+                        <div class="function-name">Lead Tournoi Amazon University Esports</div>
+                        <div class="parameters">(Organisation, Leadership, Gestion_Événements)</div>
+                        <div class="binary-decoration">01001100</div>
+                    </div>
+                    
+                    <div class="association-item">
+                        <div class="date">/* 2021-2022 */</div>
+                        <div class="function-name">Secrétaire Général - Student Gaming Network</div>
+                        <div class="parameters">(Public_Speaking, Team_Management)</div>
+                        <div class="binary-decoration">01010011</div>
+                    </div>
+                    
+                    <div class="association-item">
+                        <div class="date">/* UEM 2021 */</div>
+                        <div class="function-name">Player Manager - Équipes FR</div>
+                        <div class="parameters">(Coaching, Communication, Support)</div>
+                        <div class="binary-decoration">01010000</div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="right-column">
+                <section>
+                    <h2>npm list --education</h2>
+                    
+                    <div class="education-item">
+                        <div class="date">2021-2023</div>
+                        <div class="function-name">Master ESI en alternance</div>
+                        <div class="parameters">Sup de Vinci - Rennes</div>
+                    </div>
+                    
+                    <div class="education-item">
+                        <div class="date">2020-2021</div>
+                        <div class="function-name">Licence MIW</div>
+                        <div class="parameters">IUT d'Aix-Marseille - Gap</div>
+                    </div>
+                    
+                    <div class="education-item">
+                        <div class="date">2018-2020</div>
+                        <div class="function-name">DUT Informatique</div>
+                        <div class="parameters">IUT d'Aix-Marseille</div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 30px;">
+                    <h2>skills.matrix()</h2>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="comment">// Technologies Stack</div>
+                        <div class="skill-matrix">
+                            <div class="skill-node">
+                                JavaScript
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                PHP
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                React
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                Symfony
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                Laravel
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                SQL
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                GIT
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                HTML/CSS
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-node">
+                                Doctrine
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="comment">// Soft Skills</div>
+                        <div class="skill-matrix">
+                            <div class="skill-node">Organisation</div>
+                            <div class="skill-node">Agilité</div>
+                            <div class="skill-node">Team Work</div>
+                            <div class="skill-node">Communication</div>
+                            <div class="skill-node">Curiosité</div>
+                            <div class="skill-node">Adaptabilité</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 30px;">
+                    <h2>hobbies.forEach()</h2>
+                    <div class="hobbies-container">
+                        <div class="hobby-tag">[🏂] Snowboard</div>
+                        <div class="hobby-tag">[🏐] Volley-ball</div>
+                        <div class="hobby-tag">[🎮] Gaming</div>
+                        <div class="hobby-tag">[🎵] Musique</div>
+                        <div class="hobby-tag">[✈️] Voyages</div>
+                        <div class="hobby-tag">[🥾] Randonnée</div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
