@@ -26,12 +26,29 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Debug secret availability
+        run: |
+          echo "Checking if WEB3FORMSKEY is available..."
+          if [ -z "${{ secrets.WEB3FORMSKEY }}" ]; then
+            echo "❌ WEB3FORMSKEY secret is not available"
+            exit 1
+          else
+            echo "✅ WEB3FORMSKEY secret is available (length: ${#WEB3FORMSKEY})"
+          fi
+        env:
+          WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
+
       - name: Build with secret
         run: |
           echo "Building site with WEB3FORMS configuration..."
+          # Vérifier que le répertoire existe
+          ls -la currentFolio/
           # Injecter la clé Web3Forms dans le fichier JavaScript
           echo "window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';" > currentFolio/web3forms-config.js
           echo "Configuration Web3Forms injectée avec succès"
+          # Vérifier le contenu
+          echo "Contenu du fichier généré:"
+          cat currentFolio/web3forms-config.js
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 
