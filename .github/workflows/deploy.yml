@@ -59,6 +59,20 @@ jobs:
           echo "=== Nouveau contenu du fichier ==="
           cat currentFolio/web3forms-config.js
           echo "=== Fin du nouveau contenu ==="
+
+          # Vérification finale avant upload
+          echo "=== Vérification finale avant upload ==="
+          if grep -q '${{ secrets.WEB3FORMSKEY }}' currentFolio/web3forms-config.js; then
+            echo "✅ Clé correctement présente dans le fichier"
+          else
+            echo "❌ ERREUR: La clé n'est pas dans le fichier!"
+            echo "Contenu actuel:"
+            hexdump -C currentFolio/web3forms-config.js
+          fi
+
+          # Vérifier tous les fichiers qui vont être uploadés
+          echo "=== Fichiers qui seront dans l'artifact ==="
+          find . -name "web3forms-config.js" -exec echo "Fichier trouvé: {}" \; -exec cat {} \;
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 
