@@ -36,10 +36,8 @@ jobs:
           echo "=== INJECTION DE LA CLÉ ==="
           # Force l'écrasement complet
           rm -f currentFolio/web3forms-config.js
-          cat > currentFolio/web3forms-config.js << 'EOF'
-// Configuration Web3Forms - Clé injectée automatiquement lors du déploiement
-window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';
-EOF
+          echo "// Configuration Web3Forms - Clé injectée automatiquement lors du déploiement" > currentFolio/web3forms-config.js
+          echo "window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';" >> currentFolio/web3forms-config.js
 
           echo "=== VÉRIFICATION POST-INJECTION ==="
           ls -la currentFolio/web3forms-config.js
