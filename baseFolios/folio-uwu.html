@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas Bracq - Développeur Fullstack | Cat Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Comfortaa:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --pink: #ffb3d9;
+            --light-pink: #ffe0f0;
+            --purple: #c589e8;
+            --light-purple: #e8d5f2;
+            --blue: #8fb4ff;
+            --yellow: #ffd93d;
+            --cream: #fff8e7;
+            --brown: #8b6355;
+        }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, var(--light-pink) 0%, var(--light-purple) 50%, #e6f3ff 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Pattes de chat animées */
+        .paw-prints {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.1;
+        }
+        
+        .paw {
+            position: absolute;
+            font-size: 30px;
+            animation: float 15s infinite linear;
+        }
+        
+        .paw:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .paw:nth-child(2) { left: 30%; animation-delay: 3s; }
+        .paw:nth-child(3) { left: 50%; animation-delay: 6s; }
+        .paw:nth-child(4) { left: 70%; animation-delay: 9s; }
+        .paw:nth-child(5) { left: 90%; animation-delay: 12s; }
+        
+        @keyframes float {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(197, 137, 232, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Oreilles de chat sur le container */
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            z-index: -1;
+        }
+        
+        .container::before {
+            left: 20px;
+            transform: rotate(-30deg);
+            border-radius: 20px 80% 20px 80%;
+        }
+        
+        .container::after {
+            right: 20px;
+            transform: rotate(30deg);
+            border-radius: 80% 20px 80% 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--blue) 100%);
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Chat kawaii dans l'en-tête */
+        .header-cat {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 100px;
+            opacity: 0.3;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+            50% { transform: translateY(-50%) rotate(5deg); }
+        }
+        
+        h1 {
+            font-family: 'Comfortaa', cursive;
+            font-size: 3em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 3px 3px 0px rgba(139, 99, 85, 0.2);
+            margin-bottom: 10px;
+            display: inline-block;
+            position: relative;
+        }
+        
+        h1::after {
+            content: ' 😺';
+            font-size: 0.6em;
+            position: absolute;
+            right: -50px;
+            top: 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .subtitle {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .cat-level {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.02);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 50px;
+        }
+        
+        h2 {
+            font-family: 'Comfortaa', cursive;
+            color: var(--purple);
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        h2::before {
+            content: '🐾';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+        }
+        
+        .experience-card {
+            background: linear-gradient(135deg, var(--cream) 0%, white 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            border: 2px solid var(--light-purple);
+            transition: all 0.3s;
+        }
+        
+        .experience-card:hover {
+            transform: translateX(10px);
+            box-shadow: -5px 5px 20px rgba(197, 137, 232, 0.2);
+        }
+        
+        .experience-card::before {
+            content: '🐱';
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 1.5em;
+            opacity: 0.2;
+        }
+        
+        .date {
+            color: var(--pink);
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .position {
+            color: var(--purple);
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .company {
+            color: var(--brown);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        .achievement {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .achievement::before {
+            content: '✨';
+            margin-right: 10px;
+        }
+        
+        .education-box {
+            background: linear-gradient(135deg, var(--light-purple), var(--light-pink));
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .education-box::after {
+            content: '🎓';
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 3em;
+            opacity: 0.1;
+        }
+        
+        .skills-section {
+            margin-bottom: 30px;
+        }
+        
+        .skill-category {
+            font-weight: 700;
+            color: var(--purple);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .skill-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .skill-pill {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(197, 137, 232, 0.3);
+        }
+        
+        .skill-pill:hover {
+            transform: translateY(-3px) rotate(-5deg);
+            box-shadow: 0 5px 15px rgba(197, 137, 232, 0.4);
+        }
+        
+        .soft-skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .soft-skill-item {
+            background: white;
+            border: 2px solid var(--light-purple);
+            padding: 10px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .soft-skill-item:hover {
+            background: var(--light-purple);
+            transform: scale(1.05);
+        }
+        
+        .soft-skill-item::after {
+            content: '💝';
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .soft-skill-item:hover::after {
+            opacity: 1;
+        }
+        
+        .hobbies-section {
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.1), rgba(255, 179, 217, 0.1));
+            padding: 20px;
+            border-radius: 20px;
+        }
+        
+        .hobbies-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .hobby-card {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .hobby-card:hover {
+            border-color: var(--pink);
+            transform: translateY(-5px) rotate(5deg);
+            box-shadow: 0 5px 15px rgba(255, 179, 217, 0.3);
+        }
+        
+        .hobby-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .association-card {
+            background: rgba(255, 248, 231, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--yellow);
+            position: relative;
+        }
+        
+        .association-card::before {
+            content: '🏆';
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 1.2em;
+            opacity: 0.5;
+        }
+        
+        /* Easter egg : miaou au survol du nom */
+        h1:hover::after {
+            content: ' Miaou~';
+            animation: none;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            header {
+                background: linear-gradient(135deg, var(--pink), var(--purple)) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .paw-prints {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .hobbies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="paw-prints">
+        <div class="paw">🐾</div>
+        <div class="paw">🐾</div>
+        <div class="paw">🐾</div>
+        <div class="paw">🐾</div>
+        <div class="paw">🐾</div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="header-cat">😸</div>
+            <h1>Lucas Bracq</h1>
+            <div class="subtitle">Développeur Fullstack & Cat Enthusiast</div>
+            <div class="cat-level">🐱 Level: Senior Cat Developer 🐱</div>
+            <div style="color: white; margin: 10px 0;">🎯 En recherche d'un CDI purrfect!</div>
+            
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <span>🏠</span> 173 Av. de la plage, 06190 Roquebrune
+                </div>
+                <div class="contact-item">
+                    <span>🚗</span> Permis B, Véhiculé
+                </div>
+                <div class="contact-item">
+                    <span>💼</span> LinkedIn: Lucas 'Mags' Bracq
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <section>
+                    <h2>Expériences Professionnelles</h2>
+                    
+                    <div class="experience-card">
+                        <div class="date">Octobre 2023 - Aujourd'hui</div>
+                        <div class="position">Développeur Fullstack PHP</div>
+                        <div class="company">CruiseTech SARL • Monaco</div>
+                        <div class="description">
+                            <div class="achievement">Création de nouveaux outils innovants</div>
+                            <div class="achievement">Performance boost de 30% sur le backoffice</div>
+                            <div class="achievement">Refactoring complet de l'architecture</div>
+                            <div class="achievement">Stack: HTML/CSS/PHP/JavaScript/Symfony/SQL</div>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-card">
+                        <div class="date">Novembre 2022 - Septembre 2023</div>
+                        <div class="position">Alternant Développeur Web</div>
+                        <div class="company">CodeRhapsodie • Lyon/Remote</div>
+                        <div class="description">
+                            <div class="achievement">Solutions Symfony & EZPublish</div>
+                            <div class="achievement">Contribution open source active</div>
+                            <div class="achievement">Technologies web modernes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-card">
+                        <div class="date">Octobre 2021 - Mars 2022</div>
+                        <div class="position">Alternant Développeur Web</div>
+                        <div class="company">Silamir • Rennes</div>
+                        <div class="description">
+                            <div class="achievement">Migration Bitrix réussie</div>
+                            <div class="achievement">+10% d'amélioration des performances</div>
+                            <div class="achievement">Modernisation technologique</div>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-card">
+                        <div class="date">Mars 2021 - Juin 2021</div>
+                        <div class="position">Stagiaire Développeur Web</div>
+                        <div class="company">Depiltech • Nice</div>
+                        <div class="description">
+                            <div class="achievement">Amélioration du site principal</div>
+                            <div class="achievement">Nouvelles fonctionnalités back-office</div>
+                            <div class="achievement">Framework Symfony</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 30px;">
+                    <h2>Expériences Associatives</h2>
+                    
+                    <div class="association-card">
+                        <div class="date">2021-2023</div>
+                        <div class="position">Lead Tournoi Amazon University Esports</div>
+                        <div style="color: #888; margin-top: 5px;">Organisation • Leadership • Gestion d'événements</div>
+                    </div>
+                    
+                    <div class="association-card">
+                        <div class="date">2021-2022</div>
+                        <div class="position">Secrétaire Général - Student Gaming Network</div>
+                        <div style="color: #888; margin-top: 5px;">Prise de parole • Management d'équipe</div>
+                    </div>
+                    
+                    <div class="association-card">
+                        <div class="date">UEM 2021</div>
+                        <div class="position">Player Manager - Équipes FR</div>
+                        <div style="color: #888; margin-top: 5px;">Coaching • Communication • Support</div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="right-column">
+                <section>
+                    <h2>Formation</h2>
+                    
+                    <div class="education-box">
+                        <div class="date">2021-2023</div>
+                        <div class="position">Master ESI en alternance</div>
+                        <div class="company">Sup de Vinci • Rennes</div>
+                    </div>
+                    
+                    <div class="education-box">
+                        <div class="date">2020-2021</div>
+                        <div class="position">Licence MIW</div>
+                        <div class="company">IUT d'Aix-Marseille • Gap</div>
+                    </div>
+                    
+                    <div class="education-box">
+                        <div class="date">2018-2020</div>
+                        <div class="position">DUT Informatique</div>
+                        <div class="company">IUT d'Aix-Marseille • Aix</div>
+                    </div>
+                </section>
+                
+                <section class="skills-section" style="margin-top: 30px;">
+                    <h2>Compétences</h2>
+                    
+                    <div class="skill-category">Technologies & Frameworks</div>
+                    <div class="skill-pills">
+                        <span class="skill-pill">JavaScript</span>
+                        <span class="skill-pill">PHP</span>
+                        <span class="skill-pill">React</span>
+                        <span class="skill-pill">Symfony</span>
+                        <span class="skill-pill">Laravel</span>
+                        <span class="skill-pill">SQL</span>
+                        <span class="skill-pill">GIT</span>
+                        <span class="skill-pill">HTML/CSS</span>
+                        <span class="skill-pill">Doctrine</span>
+                    </div>
+                    
+                    <div class="skill-category">Soft Skills</div>
+                    <div class="soft-skills-grid">
+                        <div class="soft-skill-item">Organisation</div>
+                        <div class="soft-skill-item">Agilité</div>
+                        <div class="soft-skill-item">Relationnel</div>
+                        <div class="soft-skill-item">Esprit d'équipe</div>
+                        <div class="soft-skill-item">Curiosité</div>
+                        <div class="soft-skill-item">Communication</div>
+                        <div class="soft-skill-item">Langues</div>
+                        <div class="soft-skill-item">Adaptabilité</div>
+                    </div>
+                </section>
+                
+                <section class="hobbies-section" style="margin-top: 30px;">
+                    <h2>Centres d'Intérêt</h2>
+                    <div class="hobbies-grid">
+                        <div class="hobby-card">
+                            <div class="hobby-icon">🏂</div>
+                            <div>Snowboard</div>
+                        </div>
+                        <div class="hobby-card">
+                            <div class="hobby-icon">🏐</div>
+                            <div>Volley</div>
+                        </div>
+                        <div class="hobby-card">
+                            <div class="hobby-icon">🎮</div>
+                            <div>Gaming</div>
+                        </div>
+                        <div class="hobby-card">
+                            <div class="hobby-icon">🎵</div>
+                            <div>Musique</div>
+                        </div>
+                        <div class="hobby-card">
+                            <div class="hobby-icon">✈️</div>
+                            <div>Voyages</div>
+                        </div>
+                        <div class="hobby-card">
+                            <div class="hobby-icon">🥾</div>
+                            <div>Randonnée</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

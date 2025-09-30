@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email Automatique - Portfolio Lucas Bracq</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00fff9;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(0, 255, 249, 0.1);
+            border: 2px solid #00fff9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .success { background: rgba(57, 255, 20, 0.2); color: #39ff14; }
+        .error { background: rgba(255, 107, 0, 0.2); color: #ff6b00; }
+        .warning { background: rgba(255, 255, 0, 0.2); color: #ffff00; }
+        .info { background: rgba(0, 255, 249, 0.2); color: #00fff9; }
+        .log-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 3px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .test-btn {
+            background: transparent;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        .test-btn:hover {
+            background: #ff00ff;
+            color: #0a0a0a;
+        }
+        .counter {
+            font-size: 2em;
+            text-align: center;
+            color: #39ff14;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Email Automatique - Portfolio Cyberpunk</h1>
+
+        <div class="test-section">
+            <h2>📧 Test d'Envoi Automatique</h2>
+            <p><strong>Email cible:</strong> lucas.bracq.pro+notifSite@gmail.com</p>
+            <p><strong>Objectif:</strong> Vérifier que l'email est envoyé automatiquement à chaque nouvelle visite</p>
+
+            <div class="counter" id="countdown">
+                Initialisation en cours...
+            </div>
+
+            <div id="status-container">
+                <div class="status info">🔄 Chargement des services...</div>
+            </div>
+
+            <button class="test-btn" onclick="forceEmailTest()">🚀 Forcer Test Email</button>
+            <button class="test-btn" onclick="validateWeb3Forms()">🔑 Valider Web3Forms</button>
+            <button class="test-btn" onclick="testEmailSending()">🧪 Test Simple</button>
+            <button class="test-btn" onclick="resetSession()">🔄 Reset Session</button>
+            <button class="test-btn" onclick="checkEmailService()">🔍 Vérifier Service</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Logs en Temps Réel</h2>
+            <div id="log-container" class="log-container">
+                <div class="info">[INIT] Démarrage du test d'email automatique...</div>
+            </div>
+            <button class="test-btn" onclick="clearLogs()">🗑️ Effacer Logs</button>
+        </div>
+
+        <div class="test-section">
+            <h2>⚙️ Configuration</h2>
+            <div id="config-info">
+                <div class="warning">⏳ Vérification de la configuration...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Instructions</h2>
+            <ol>
+                <li><strong>Service utilisé :</strong> Web3Forms uniquement (EmailJS supprimé)</li>
+                <li><strong>Configuration :</strong> Clé Web3Forms déjà configurée</li>
+                <li><strong>Test de validation :</strong> Cliquez "🔑 Valider Web3Forms"</li>
+                <li><strong>Test d'envoi :</strong> Cliquez "🚀 Forcer Test Email"</li>
+                <li><strong>Vérifiez votre boîte mail :</strong> lucas.bracq.pro@gmail.com</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Error Handler -->
+    <script src="errorHandler.js"></script>
+
+    <!-- Email Service -->
+    <script src="emailService.js"></script>
+
+    <script>
+        let testStartTime = Date.now();
+        let countdownTimer;
+        let logCount = 0;
+
+        // Enhanced logging avec timestamp
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            logCount++;
+
+            // Limiter à 100 logs
+            if (logCount > 100) {
+                logContainer.removeChild(logContainer.firstChild);
+                logCount--;
+            }
+        }
+
+        // Mise à jour du statut
+        function updateStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('status-container');
+            const status = document.createElement('div');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            statusContainer.appendChild(status);
+
+            // Garder seulement les 5 derniers statuts
+            while (statusContainer.children.length > 5) {
+                statusContainer.removeChild(statusContainer.firstChild);
+            }
+        }
+
+        // Countdown pour l'auto-test
+        function startCountdown() {
+            let seconds = 5;
+            const countdownEl = document.getElementById('countdown');
+
+            countdownTimer = setInterval(() => {
+                if (seconds > 0) {
+                    countdownEl.textContent = `Auto-test dans ${seconds} secondes...`;
+                    seconds--;
+                } else {
+                    countdownEl.textContent = '🚀 Lancement auto-test !';
+                    clearInterval(countdownTimer);
+                    runAutoEmailTest();
+                }
+            }, 1000);
+        }
+
+        // Test automatique d'email
+        function runAutoEmailTest() {
+            addLog('🎯 Démarrage du test automatique d\'email', 'info');
+            updateStatus('🚀 Test automatique en cours...', 'warning');
+
+            // Vérifier que emailService est disponible
+            if (!window.emailService) {
+                addLog('❌ ERREUR: emailService non disponible!', 'error');
+                updateStatus('❌ EmailService non trouvé', 'error');
+                return;
+            }
+
+            addLog('✅ EmailService trouvé', 'success');
+
+            // Créer des données de visiteur de test
+            const testVisitorData = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: 'Test automatique',
+                language: 'fr',
+                screenResolution: `${screen.width}x${screen.height}`,
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                pageUrl: window.location.href,
+                pageTitle: '🧪 Test Email Automatique',
+                testMode: true
+            };
+
+            addLog('📊 Données de test créées', 'info');
+
+            // Envoyer l'email de test
+            window.emailService.sendVisitorNotification(testVisitorData)
+                .then(result => {
+                    if (result && result.success) {
+                        addLog(`🎉 EMAIL ENVOYÉ AVEC SUCCÈS via ${result.service}!`, 'success');
+                        updateStatus(`✅ Email envoyé via ${result.service}`, 'success');
+
+                        document.getElementById('countdown').textContent = '✅ Test réussi !';
+                        document.getElementById('countdown').style.color = '#39ff14';
+                    } else {
+                        addLog('⚠️ Échec de l\'envoi d\'email', 'warning');
+                        updateStatus('⚠️ Échec envoi email', 'warning');
+                        addLog(`Détails: ${JSON.stringify(result)}`, 'warning');
+                    }
+                })
+                .catch(error => {
+                    addLog(`❌ ERREUR lors de l'envoi: ${error.message}`, 'error');
+                    updateStatus('❌ Erreur envoi email', 'error');
+                    console.error('Erreur test email:', error);
+                });
+        }
+
+        // Forcer un test manuel
+        function forceEmailTest() {
+            addLog('🔧 Test manuel forcé', 'info');
+            runAutoEmailTest();
+        }
+
+        // Valider la configuration Web3Forms
+        async function validateWeb3Forms() {
+            addLog('🔑 Validation de Web3Forms...', 'info');
+            updateStatus('🔍 Validation Web3Forms...', 'info');
+
+            if (!window.emailService) {
+                addLog('❌ EmailService non disponible', 'error');
+                updateStatus('❌ EmailService manquant', 'error');
+                return;
+            }
+
+            try {
+                const validation = await window.emailService.validateWeb3FormsKey();
+
+                if (validation.valid) {
+                    addLog('✅ Clé Web3Forms VALIDE!', 'success');
+                    updateStatus('✅ Web3Forms configuré', 'success');
+                } else {
+                    addLog(`❌ Clé Web3Forms INVALIDE: ${validation.message}`, 'error');
+                    updateStatus('❌ Clé Web3Forms invalide', 'error');
+                }
+
+                addLog(`Détails: ${JSON.stringify(validation)}`, 'info');
+            } catch (error) {
+                addLog(`💥 Erreur validation: ${error.message}`, 'error');
+                updateStatus('💥 Erreur validation', 'error');
+            }
+        }
+
+        // Test simple d'envoi d'email
+        async function testEmailSending() {
+            addLog('🧪 Test simple d\'envoi d\'email...', 'info');
+            updateStatus('🧪 Test en cours...', 'info');
+
+            if (!window.emailService) {
+                addLog('❌ EmailService non disponible', 'error');
+                updateStatus('❌ EmailService manquant', 'error');
+                return;
+            }
+
+            try {
+                const result = await window.emailService.testEmailSending();
+
+                if (result && result.success) {
+                    addLog(`🎉 TEST EMAIL RÉUSSI via ${result.service}!`, 'success');
+                    updateStatus('✅ Test réussi', 'success');
+                } else {
+                    addLog('⚠️ Test échoué - voir détails dans la console', 'warning');
+                    updateStatus('⚠️ Test échoué', 'warning');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur test: ${error.message}`, 'error');
+                updateStatus('❌ Test échoué', 'error');
+                console.error('Erreur complète:', error);
+            }
+        }
+
+        // Reset de la session
+        function resetSession() {
+            sessionStorage.clear();
+            localStorage.removeItem('visitor-tracked');
+            addLog('🔄 Session reset - prochain chargement sera tracké comme nouvelle visite', 'info');
+            updateStatus('🔄 Session reset', 'info');
+        }
+
+        // Vérifier le service email
+        function checkEmailService() {
+            addLog('🔍 Vérification du service email...', 'info');
+
+            if (window.emailService) {
+                const config = window.emailService.checkConfiguration();
+                addLog('✅ EmailService disponible', 'success');
+                addLog(`Configuration: ${JSON.stringify(config)}`, 'info');
+
+                updateStatus('✅ EmailService OK', 'success');
+
+                // Afficher la configuration
+                const configInfo = document.getElementById('config-info');
+                configInfo.innerHTML = `
+                    <div class="success">✅ EmailService chargé</div>
+                    <div class="${config.web3forms ? 'success' : 'error'}">
+                        ${config.web3forms ? '✅' : '❌'} Web3Forms: ${config.web3forms ? 'Configuré' : 'Non configuré'}
+                    </div>
+                    <div class="${config.fetch ? 'success' : 'error'}">
+                        ${config.fetch ? '✅' : '❌'} Fetch API: ${config.fetch ? 'Disponible' : 'Non disponible'}
+                    </div>
+                    <div class="${config.online ? 'success' : 'error'}">
+                        ${config.online ? '✅' : '❌'} Connexion: ${config.online ? 'En ligne' : 'Hors ligne'}
+                    </div>
+                    <div class="info">ℹ️ Service utilisé: Web3Forms uniquement</div>
+                `;
+            } else {
+                addLog('❌ EmailService non disponible!', 'error');
+                updateStatus('❌ EmailService manquant', 'error');
+
+                document.getElementById('config-info').innerHTML = `
+                    <div class="error">❌ EmailService non chargé</div>
+                    <div class="warning">⚠️ Vérifiez que emailService.js est bien inclus</div>
+                `;
+            }
+        }
+
+        // Effacer les logs
+        function clearLogs() {
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '<div class="info">[CLEAR] Logs effacés</div>';
+            logCount = 1;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Page de test chargée', 'info');
+            updateStatus('🔄 Initialisation...', 'info');
+
+            // Attendre que tous les scripts soient chargés
+            setTimeout(() => {
+                checkEmailService();
+                addLog('⏱️ Démarrage du countdown pour auto-test', 'info');
+                startCountdown();
+            }, 1000);
+        });
+
+        // Test si l'email est envoyé automatiquement par le système normal
+        window.addEventListener('load', function() {
+            addLog('🌐 Window loaded - Vérification si système normal s\'active...', 'info');
+
+            // Écouter les notifications de succès
+            const originalShowNotification = window.showNotification;
+            if (typeof originalShowNotification === 'function') {
+                window.showNotification = function(message) {
+                    addLog(`📢 Notification: ${message}`, 'info');
+                    return originalShowNotification(message);
+                };
+            }
+        });
+
+        // Surveiller les erreurs
+        window.addEventListener('error', function(e) {
+            addLog(`💥 Erreur JS: ${e.message} (${e.filename}:${e.lineno})`, 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            addLog(`💥 Promise rejetée: ${e.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>

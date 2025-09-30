@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Lucas Bracq | CyberDev</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00fff9;
+            --neon-magenta: #ff00ff;
+            --neon-orange: #ff6b00;
+            --neon-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --grid-color: #00fff940;
+            --text-light: #e0e0e0;
+            --text-dim: #888;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Background similaire à l'index */
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 255, 249, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+            z-index: -1;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(0, 255, 249, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 249, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+            animation: grid-drift 20s linear infinite;
+        }
+
+        @keyframes grid-drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 249, 0.1), rgba(255, 0, 255, 0.1));
+            border-bottom: 2px solid var(--neon-cyan);
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px var(--neon-cyan);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--neon-magenta);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: 2px solid var(--neon-orange);
+            color: var(--neon-orange);
+            padding: 10px 20px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-orange);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-orange);
+        }
+
+        /* Contact Container */
+        .contact-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, rgba(0, 255, 249, 0.05), rgba(255, 0, 255, 0.05));
+            border: 2px solid var(--grid-color);
+            padding: 30px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            transition: left 0.5s;
+        }
+
+        .contact-card:hover::before {
+            left: 100%;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 15px 40px rgba(0, 255, 249, 0.3);
+        }
+
+        .contact-icon {
+            font-size: 3rem;
+            color: var(--neon-orange);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .contact-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            color: var(--neon-cyan);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .contact-info {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .contact-link {
+            color: var(--neon-magenta);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .contact-link:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 50px 0;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            transition: left 0.5s;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            color: var(--dark-bg);
+            background: var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
+        }
+
+        .action-btn.secondary {
+            border-color: var(--neon-magenta);
+            color: var(--neon-magenta);
+        }
+
+        .action-btn.secondary::before {
+            background: linear-gradient(90deg, transparent, var(--neon-magenta), transparent);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 30px var(--neon-magenta);
+        }
+
+        /* Status Section */
+        .status-section {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(0, 255, 249, 0.1));
+            border: 2px solid var(--neon-green);
+            padding: 30px;
+            margin: 50px 0;
+            border-radius: 10px;
+        }
+
+        .status-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .status-text {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: rgba(0, 255, 249, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 16px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn.active {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(0, 255, 249, 0.2);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Hidden class for language switching */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .back-btn {
+                position: relative;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            color: var(--dark-bg);
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 249, 0.5);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Copy animation */
+        .copied {
+            animation: copyFlash 0.6s ease;
+        }
+
+        @keyframes copyFlash {
+            0% { background: var(--neon-green); color: var(--dark-bg); }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="cyber-bg"></div>
+    <div class="cyber-grid"></div>
+
+    <!-- Back Button -->
+    <a href="index.html" class="back-btn lang-fr">← Retour Portfolio</a>
+    <a href="index.html" class="back-btn lang-en hidden">← Back to Portfolio</a>
+
+    <!-- Header -->
+    <div class="header">
+        <h1 class="lang-fr">[ Protocole de Contact ]</h1>
+        <h1 class="lang-en hidden">[ Contact Protocol ]</h1>
+        <p class="lang-fr">Connexion Établie - Transmission Sécurisée</p>
+        <p class="lang-en hidden">Connection Established - Secure Transmission</p>
+    </div>
+
+    <div class="contact-container">
+        <!-- Status Section -->
+        <div class="status-section">
+            <div class="status-title lang-fr">Statut: En recherche d'un CDI</div>
+            <div class="status-title lang-en hidden">Status: Looking for CDI Contract</div>
+            <div class="status-text lang-fr">🟢 Disponible immédiatement pour nouveaux défis</div>
+            <div class="status-text lang-en hidden">🟢 Available immediately for new challenges</div>
+        </div>
+
+        <!-- Contact Grid -->
+        <div class="contact-grid">
+            <!-- Phone -->
+            <div class="contact-card">
+                <span class="contact-icon">📱</span>
+                <div class="contact-title lang-fr">Communication Directe</div>
+                <div class="contact-title lang-en hidden">Direct Communication</div>
+                <div class="contact-info">
+                    <a href="tel:+33783313081" class="contact-link" id="phone-link">
+                        +33 7 83 31 30 81
+                    </a>
+                    <br><br>
+                    <span class="lang-fr">Disponible 9h-18h</span>
+                    <span class="lang-en hidden">Available 9AM-6PM</span>
+                    <br>
+                    <button onclick="copyToClipboard('+33783313081', 'phone')"
+                            class="action-btn secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.8rem;">
+                        <span class="lang-fr">Copier</span>
+                        <span class="lang-en hidden">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="contact-card">
+                <span class="contact-icon">📧</span>
+                <div class="contact-title lang-fr">Transmission Email</div>
+                <div class="contact-title lang-en hidden">Email Transmission</div>
+                <div class="contact-info">
+                    <a href="mailto:lucas.bracq.pro@gmail.com" class="contact-link" id="email-link">
+                        lucas.bracq.pro@gmail.com
+                    </a>
+                    <br><br>
+                    <span class="lang-fr">Réponse sous 24h garantie</span>
+                    <span class="lang-en hidden">Response within 24h guaranteed</span>
+                    <br>
+                    <button onclick="copyToClipboard('lucas.bracq.pro@gmail.com', 'email')"
+                            class="action-btn secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.8rem;">
+                        <span class="lang-fr">Copier</span>
+                        <span class="lang-en hidden">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="contact-card">
+                <span class="contact-icon">💼</span>
+                <div class="contact-title lang-fr">Réseau Professionnel</div>
+                <div class="contact-title lang-en hidden">Professional Network</div>
+                <div class="contact-info">
+                    <a href="https://www.linkedin.com/in/lucas-bracq-250a72190/"
+                       target="_blank"
+                       class="contact-link"
+                       id="linkedin-link">
+                        LinkedIn: Lucas Bracq
+                    </a>
+                    <br><br>
+                    <span class="lang-fr">Parcours & Recommandations</span>
+                    <span class="lang-en hidden">Career & Recommendations</span>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="contact-card">
+                <span class="contact-icon">📍</span>
+                <div class="contact-title lang-fr">Localisation</div>
+                <div class="contact-title lang-en hidden">Location</div>
+                <div class="contact-info">
+                    06190 Roquebrune Cap-Martin
+                    <br><br>
+                    <span class="lang-fr">🚗 Permis B + Véhicule personnel</span>
+                    <span class="lang-en hidden">🚗 Driving License + Personal Vehicle</span>
+                    <br>
+                    <span class="lang-fr">📍 Mobilité: Côte d'Azur & télétravail</span>
+                    <span class="lang-en hidden">📍 Mobility: French Riviera & remote work</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button onclick="sendQuickEmail()" class="action-btn">
+                <span class="lang-fr">📧 Envoyer Email Rapide</span>
+                <span class="lang-en hidden">📧 Send Quick Email</span>
+            </button>
+            <button onclick="scheduleCall()" class="action-btn secondary">
+                <span class="lang-fr">📞 Programmer Appel</span>
+                <span class="lang-en hidden">📞 Schedule Call</span>
+            </button>
+            <a href="https://www.linkedin.com/in/lucas-bracq-250a72190/"
+               target="_blank"
+               class="action-btn"
+               onclick="trackLinkedInClick()">
+                <span class="lang-fr">💼 Voir Profil LinkedIn</span>
+                <span class="lang-en hidden">💼 View LinkedIn Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Language switching functionality
+        const langButtons = document.querySelectorAll('.lang-btn');
+        const frElements = document.querySelectorAll('.lang-fr');
+        const enElements = document.querySelectorAll('.lang-en');
+
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+
+                // Update active button
+                langButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Show/hide content based on language
+                if (lang === 'fr') {
+                    frElements.forEach(el => el.classList.remove('hidden'));
+                    enElements.forEach(el => el.classList.add('hidden'));
+                    document.documentElement.lang = 'fr';
+                } else {
+                    frElements.forEach(el => el.classList.add('hidden'));
+                    enElements.forEach(el => el.classList.remove('hidden'));
+                    document.documentElement.lang = 'en';
+                }
+
+                // Store language preference
+                localStorage.setItem('preferred-language', lang);
+            });
+        });
+
+        // Load saved language preference
+        const savedLang = localStorage.getItem('preferred-language') || 'fr';
+        const savedLangBtn = document.querySelector(`[data-lang="${savedLang}"]`);
+        if (savedLangBtn) {
+            savedLangBtn.click();
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text, type) {
+            navigator.clipboard.writeText(text).then(() => {
+                const currentLang = document.documentElement.lang;
+                const message = currentLang === 'fr'
+                    ? `✅ ${type === 'phone' ? 'Numéro' : 'Email'} copié dans le presse-papiers!`
+                    : `✅ ${type === 'phone' ? 'Phone number' : 'Email'} copied to clipboard!`;
+
+                showNotification(message);
+
+                // Visual feedback
+                const element = document.getElementById(`${type}-link`);
+                element.classList.add('copied');
+                setTimeout(() => {
+                    element.classList.remove('copied');
+                }, 600);
+            }).catch(() => {
+                const currentLang = document.documentElement.lang;
+                const message = currentLang === 'fr'
+                    ? '❌ Erreur lors de la copie'
+                    : '❌ Copy error';
+                showNotification(message);
+            });
+        }
+
+        // Send quick email
+        function sendQuickEmail() {
+            const currentLang = document.documentElement.lang;
+            const subject = currentLang === 'fr'
+                ? 'Contact depuis votre portfolio cyberpunk'
+                : 'Contact from your cyberpunk portfolio';
+
+            const body = currentLang === 'fr'
+                ? 'Bonjour Lucas,\n\nJe vous contacte suite à la consultation de votre portfolio.\n\n[Votre message ici]\n\nCordialement,'
+                : 'Hello Lucas,\n\nI am contacting you after viewing your portfolio.\n\n[Your message here]\n\nBest regards,';
+
+            const emailUrl = `mailto:lucas.bracq.pro@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = emailUrl;
+
+            // Track the email action
+            trackEmailAction('quick_email');
+        }
+
+        // Schedule call
+        function scheduleCall() {
+            const currentLang = document.documentElement.lang;
+            const message = currentLang === 'fr'
+                ? '📞 Appelez-moi au +33 7 83 31 30 81 ou envoyez un email pour programmer un entretien!'
+                : '📞 Call me at +33 7 83 31 30 81 or send an email to schedule an interview!';
+
+            showNotification(message);
+
+            // Track the call scheduling action
+            trackEmailAction('schedule_call');
+        }
+
+        // Track LinkedIn click
+        function trackLinkedInClick() {
+            trackEmailAction('linkedin_click');
+        }
+
+        // Email tracking function
+        function trackEmailAction(action) {
+            const currentLang = document.documentElement.lang;
+            const timestamp = new Date().toISOString();
+
+            const trackingData = {
+                action: action,
+                timestamp: timestamp,
+                language: currentLang,
+                userAgent: navigator.userAgent,
+                referrer: document.referrer || 'Direct'
+            };
+
+            // Send notification email (simulate - in real implementation, this would be sent via a backend service)
+            fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    to: 'lucas.bracq.pro+notifSite@gmail.com',
+                    subject: `🚨 Nouvelle interaction sur votre portfolio - ${action}`,
+                    message: `
+Une nouvelle interaction a été détectée sur votre portfolio:
+
+Action: ${action}
+Heure: ${timestamp}
+Langue: ${currentLang}
+Navigateur: ${navigator.userAgent}
+Page précédente: ${document.referrer || 'Accès direct'}
+
+---
+Système de notification automatique
+                    `
+                })
+            }).catch(error => {
+                console.log('Email notification would be sent:', trackingData);
+            });
+
+            // Store locally for backup
+            const actions = JSON.parse(localStorage.getItem('portfolio-actions') || '[]');
+            actions.push(trackingData);
+            localStorage.setItem('portfolio-actions', JSON.stringify(actions));
+        }
+
+        // Notification system
+        function showNotification(message) {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Hide notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Track page load - ENVOI EMAIL AUTOMATIQUE
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page contact chargée - Tracking automatique...');
+
+            // Envoyer notification de visite de la page contact
+            setTimeout(() => {
+                trackEmailAction('contact_page_visit');
+            }, 1000);
+
+            // Envoyer aussi une notification générale de visite si c'est une nouvelle session
+            const sessionTracked = sessionStorage.getItem('visitor-tracked');
+            if (!sessionTracked) {
+                setTimeout(() => {
+                    trackVisitorOnContactPage();
+                }, 1500);
+            }
+        });
+
+        // Fonction spécifique pour tracker les visites sur la page contact
+        function trackVisitorOnContactPage() {
+            console.log('📧 Tracking visiteur sur page contact...');
+
+            const visitorData = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: document.referrer || 'Accès direct',
+                language: document.documentElement.lang || 'fr',
+                screenResolution: `${screen.width}x${screen.height}`,
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                pageUrl: window.location.href,
+                pageTitle: document.title,
+                page: 'contact'
+            };
+
+            if (window.emailService) {
+                window.emailService.sendVisitorNotification(visitorData)
+                    .then(result => {
+                        if (result && result.success) {
+                            console.log('✅ Email visiteur contact envoyé via', result.service);
+                            sessionStorage.setItem('visitor-tracked', visitorData.timestamp);
+
+                            const currentLang = document.documentElement.lang || 'fr';
+                            const message = currentLang === 'fr'
+                                ? '✅ Lucas a été notifié de votre visite !'
+                                : '✅ Lucas has been notified of your visit!';
+
+                            setTimeout(() => showNotification(message), 500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Erreur envoi email contact:', error);
+                    });
+            }
+        }
+    </script>
+
+    <!-- Error Handler -->
+    <script src="errorHandler.js"></script>
+
+    <!-- Email Service -->
+    <script src="emailService.js"></script>
+</body>
+</html>

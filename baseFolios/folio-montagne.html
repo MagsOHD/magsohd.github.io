@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas Bracq - Développeur Fullstack | Mountain Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Cabin:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --mountain-blue: #2c5f7c;
+            --sky-blue: #87ceeb;
+            --snow-white: #fafafa;
+            --pine-green: #2d5a3d;
+            --rock-gray: #4a5568;
+            --sunset-orange: #ff6b35;
+            --earth-brown: #8b4513;
+        }
+        
+        body {
+            font-family: 'Cabin', sans-serif;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f2ff 50%, #ffffff 100%);
+            color: #2d3748;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Fond avec montagnes SVG */
+        .mountain-background {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        
+        .mountain-background svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(44, 95, 124, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--mountain-blue) 0%, var(--sky-blue) 100%);
+            padding: 60px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Silhouette de montagnes dans l'en-tête */
+        header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+        }
+        
+        header::after {
+            content: '🏔️';
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 3em;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .tagline {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .contact-item {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 50px;
+        }
+        
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--mountain-blue);
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sunset-orange), var(--sky-blue));
+            border-radius: 3px;
+        }
+        
+        h2::before {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6em;
+            opacity: 0.3;
+        }
+        
+        .experience-title::before { content: '⛰️'; }
+        .education-title::before { content: '🎓'; }
+        .skills-title::before { content: '🛠️'; }
+        .hobbies-title::before { content: '🌟'; }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: var(--sunset-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            bottom: -30px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--sunset-orange), transparent);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .date {
+            color: var(--sunset-orange);
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .position {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--mountain-blue);
+            margin-bottom: 5px;
+        }
+        
+        .company {
+            color: var(--pine-green);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: var(--rock-gray);
+            line-height: 1.7;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--sky-blue);
+        }
+        
+        .education-card {
+            background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(44, 95, 124, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .education-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(44, 95, 124, 0.15);
+        }
+        
+        .skills-container {
+            margin-bottom: 30px;
+        }
+        
+        .skills-category {
+            font-weight: 600;
+            color: var(--pine-green);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .skill-tag {
+            background: linear-gradient(135deg, var(--sky-blue), var(--mountain-blue));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(44, 95, 124, 0.2);
+        }
+        
+        .skill-tag:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 10px rgba(44, 95, 124, 0.3);
+        }
+        
+        .soft-skills {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .soft-skill {
+            background: rgba(141, 206, 235, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(141, 206, 235, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .soft-skill:hover {
+            background: rgba(141, 206, 235, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .hobbies-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .hobby-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .hobby-item:hover {
+            border-color: var(--sunset-orange);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2);
+        }
+        
+        .hobby-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        
+        .hobby-name {
+            font-weight: 500;
+            color: var(--mountain-blue);
+        }
+        
+        .association-section {
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.1), rgba(44, 95, 124, 0.05));
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .association-item {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .association-item::before {
+            content: '🏆';
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+            }
+            header {
+                background: var(--mountain-blue) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .mountain-background {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .hobbies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mountain-background">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 400">
+            <path fill="#2c5f7c" fill-opacity="0.3" d="M0,256L48,240C96,224,192,192,288,186.7C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,160C1248,160,1344,192,1392,208L1440,224L1440,400L1392,400C1344,400,1248,400,1152,400C1056,400,960,400,864,400C768,400,672,400,576,400C480,400,384,400,288,400C192,400,96,400,48,400L0,400Z"></path>
+        </svg>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Lucas Bracq</h1>
+            <div class="tagline">Développeur Fullstack • Passionné de Tech & Nature</div>
+            <div class="tagline" style="font-size: 1.1em; margin-bottom: 30px;">🎯 En recherche d'un CDI pour de nouveaux sommets professionnels</div>
+            
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <span>📍</span> 173 Av. de la plage, 06190 Roquebrune
+                </div>
+                <div class="contact-item">
+                    <span>🚗</span> Permis B, Véhiculé
+                </div>
+                <div class="contact-item">
+                    <span>💼</span> LinkedIn: Lucas 'Mags' Bracq
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <section>
+                    <h2 class="experience-title">Parcours Professionnel</h2>
+                    
+                    <div class="timeline-item">
+                        <div class="date">Octobre 2023 - Aujourd'hui</div>
+                        <div class="position">Développeur Fullstack PHP</div>
+                        <div class="company">CruiseTech SARL • Monaco</div>
+                        <div class="description">
+                            Création de nouveaux outils et amélioration spectaculaire des performances du backoffice (gain de 30%, passage de 1,3s à 0,9s) grâce à un refactoring complet de l'architecture existante.<br><br>
+                            <strong>Technologies:</strong> HTML/CSS, PHP, JavaScript, Symfony, SQL
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="date">Novembre 2022 - Septembre 2023</div>
+                        <div class="position">Alternant Développeur Web</div>
+                        <div class="company">CodeRhapsodie • Lyon/Télétravail</div>
+                        <div class="description">
+                            Développement de solutions diverses utilisant Symfony et EZPublish. Contribution active à des projets open source et maîtrise de technologies variées.<br><br>
+                            <strong>Technologies:</strong> HTML/CSS, PHP, JavaScript
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="date">Octobre 2021 - Mars 2022</div>
+                        <div class="position">Alternant Développeur Web</div>
+                        <div class="company">Silamir • Rennes</div>
+                        <div class="description">
+                            Migration réussie de solutions sous Bitrix avec amélioration des performances de 10% en modernisant la stack technologique.<br><br>
+                            <strong>Technologies:</strong> HTML/CSS, PHP, JavaScript
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="date">Mars 2021 - Juin 2021</div>
+                        <div class="position">Stagiaire Développeur Web</div>
+                        <div class="company">Depiltech • Nice</div>
+                        <div class="description">
+                            Amélioration du site principal de l'entreprise et développement de nouvelles fonctionnalités pour le back office.<br><br>
+                            <strong>Technologies:</strong> HTML/CSS, PHP, JavaScript, Symfony
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="association-section">
+                    <h2>Expériences Associatives</h2>
+                    
+                    <div class="association-item">
+                        <div class="date">2021-2023</div>
+                        <div class="position">Lead Tournoi Amazon University Esports</div>
+                        <div style="color: var(--rock-gray); margin-left: 20px;">Organisation d'événements • Prise de responsabilités</div>
+                    </div>
+                    
+                    <div class="association-item">
+                        <div class="date">2021-2022</div>
+                        <div class="position">Secrétaire Général - Student Gaming Network</div>
+                        <div style="color: var(--rock-gray); margin-left: 20px;">Prise de parole en public • Organisation</div>
+                    </div>
+                    
+                    <div class="association-item">
+                        <div class="date">UEM 2021</div>
+                        <div class="position">Player Manager - Équipes françaises</div>
+                        <div style="color: var(--rock-gray); margin-left: 20px;">Accompagnement • Communication</div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="right-column">
+                <section>
+                    <h2 class="education-title">Formation</h2>
+                    
+                    <div class="education-card">
+                        <div class="date">2021-2023</div>
+                        <div class="position">Master ESI en alternance</div>
+                        <div class="company">Sup de Vinci • Rennes</div>
+                    </div>
+                    
+                    <div class="education-card">
+                        <div class="date">2020-2021</div>
+                        <div class="position">Licence MIW</div>
+                        <div class="company">IUT d'Aix-Marseille • Gap</div>
+                    </div>
+                    
+                    <div class="education-card">
+                        <div class="date">2018-2020</div>
+                        <div class="position">DUT Informatique</div>
+                        <div class="company">IUT d'Aix-Marseille • Aix-en-Provence</div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 40px;">
+                    <h2 class="skills-title">Compétences</h2>
+                    
+                    <div class="skills-container">
+                        <div class="skills-category">Technologies & Frameworks</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">PHP</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Symfony</span>
+                            <span class="skill-tag">Laravel</span>
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">GIT</span>
+                            <span class="skill-tag">HTML/CSS</span>
+                            <span class="skill-tag">Doctrine</span>
+                        </div>
+                        
+                        <div class="skills-category">Soft Skills</div>
+                        <div class="soft-skills">
+                            <div class="soft-skill">Organisation</div>
+                            <div class="soft-skill">Agilité</div>
+                            <div class="soft-skill">Relationnel</div>
+                            <div class="soft-skill">Esprit d'équipe</div>
+                            <div class="soft-skill">Curiosité</div>
+                            <div class="soft-skill">Communication</div>
+                            <div class="soft-skill">Langues étrangères</div>
+                            <div class="soft-skill">Adaptabilité</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section style="margin-top: 40px;">
+                    <h2 class="hobbies-title">Centres d'Intérêt</h2>
+                    <div class="hobbies-grid">
+                        <div class="hobby-item">
+                            <div class="hobby-icon">🏂</div>
+                            <div class="hobby-name">Snowboard</div>
+                        </div>
+                        <div class="hobby-item">
+                            <div class="hobby-icon">🏐</div>
+                            <div class="hobby-name">Volley-ball</div>
+                        </div>
+                        <div class="hobby-item">
+                            <div class="hobby-icon">🎮</div>
+                            <div class="hobby-name">Jeux vidéos</div>
+                        </div>
+                        <div class="hobby-item">
+                            <div class="hobby-icon">🎵</div>
+                            <div class="hobby-name">Musique</div>
+                        </div>
+                        <div class="hobby-item">
+                            <div class="hobby-icon">✈️</div>
+                            <div class="hobby-name">Voyages</div>
+                        </div>
+                        <div class="hobby-item">
+                            <div class="hobby-icon">🥾</div>
+                            <div class="hobby-name">Randonnée</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

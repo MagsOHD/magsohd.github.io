@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email System - Lucas Bracq Portfolio</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00fff9;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(0, 255, 249, 0.1);
+            border: 1px solid #00fff9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .test-btn {
+            background: transparent;
+            border: 2px solid #00fff9;
+            color: #00fff9;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .test-btn:hover {
+            background: #00fff9;
+            color: #0a0a0a;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 3px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #39ff14; }
+        .error { color: #ff6b00; }
+        .info { color: #00fff9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test du Système d'Email - Portfolio Cyberpunk</h1>
+
+        <div class="test-section">
+            <h2>📧 Configuration Email</h2>
+            <p><strong>Email de notification:</strong> lucas.bracq.pro+notifSite@gmail.com</p>
+            <p><strong>Service configuré:</strong> <span id="email-service">Détection en cours...</span></p>
+
+            <h3>Tests Manuels:</h3>
+            <button class="test-btn" onclick="testVisitorNotification()">Test Notification Visiteur</button>
+            <button class="test-btn" onclick="testHireProtocol()">Test Protocole Embauche</button>
+            <button class="test-btn" onclick="testContactAction()">Test Action Contact</button>
+            <button class="test-btn" onclick="testEmailService()">Test Service Email</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Données Stockées Localement</h2>
+            <button class="test-btn" onclick="showStoredData()">Afficher Données</button>
+            <button class="test-btn" onclick="clearStoredData()">Effacer Données</button>
+            <button class="test-btn" onclick="exportData()">Exporter Données</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Logs en Temps Réel</h2>
+            <div id="log-container" class="log">
+                <div class="info">🚀 Système de test initialisé...</div>
+            </div>
+            <button class="test-btn" onclick="clearLogs()">Effacer Logs</button>
+        </div>
+
+        <div class="test-section">
+            <h2>⚙️ Configuration</h2>
+            <p><strong>Formspree Endpoint:</strong> <span id="formspree-endpoint">Non configuré</span></p>
+            <p><strong>EmailJS Service:</strong> <span id="emailjs-service">Non configuré</span></p>
+            <p><strong>Webhook URL:</strong> <span id="webhook-url">Non configuré</span></p>
+
+            <h3>Configuration Rapide:</h3>
+            <input type="text" id="formspree-id" placeholder="Votre Formspree Form ID" style="padding: 5px; margin: 5px;">
+            <button class="test-btn" onclick="configureFormspree()">Configurer Formspree</button>
+        </div>
+    </div>
+
+    <!-- Error Handler -->
+    <script src="errorHandler.js"></script>
+
+    <script src="emailService.js"></script>
+    <script>
+        // Enhanced logging
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Test functions
+        function testVisitorNotification() {
+            addLog('🧪 Test: Notification de visiteur...', 'info');
+
+            const visitorData = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: 'Test Manual',
+                language: 'fr',
+                screenResolution: `${screen.width}x${screen.height}`,
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+
+            if (window.emailService) {
+                window.emailService.sendVisitorNotification(visitorData)
+                    .then(result => {
+                        if (result.success) {
+                            addLog(`✅ Email envoyé avec succès via ${result.service}`, 'success');
+                        } else {
+                            addLog(`⚠️ Email sauvegardé localement (${result.service})`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        addLog(`❌ Erreur: ${error.message}`, 'error');
+                    });
+            } else {
+                addLog('❌ EmailService non chargé!', 'error');
+            }
+        }
+
+        function testHireProtocol() {
+            addLog('🧪 Test: Protocole d\'embauche...', 'info');
+
+            const actionData = {
+                action: 'hire_protocol',
+                timestamp: new Date().toISOString(),
+                language: 'fr',
+                userAgent: navigator.userAgent,
+                referrer: 'Test Manual'
+            };
+
+            if (window.emailService) {
+                window.emailService.sendActionNotification(actionData)
+                    .then(result => {
+                        if (result.success) {
+                            addLog(`✅ Notification d'embauche envoyée via ${result.service}`, 'success');
+                        } else {
+                            addLog(`⚠️ Notification sauvegardée localement (${result.service})`, 'error');
+                        }
+                    });
+            }
+        }
+
+        function testContactAction() {
+            addLog('🧪 Test: Action de contact...', 'info');
+
+            const contactData = {
+                name: 'Test Recruteur',
+                email: 'test@entreprise.com',
+                phone: '+33123456789',
+                company: 'Test Company',
+                message: 'Message de test depuis le système de test',
+                timestamp: new Date().toISOString(),
+                language: 'fr',
+                userAgent: navigator.userAgent
+            };
+
+            if (window.emailService) {
+                window.emailService.sendContactNotification(contactData)
+                    .then(result => {
+                        if (result.success) {
+                            addLog(`✅ Notification de contact envoyée via ${result.service}`, 'success');
+                        } else {
+                            addLog(`⚠️ Contact sauvegardé localement (${result.service})`, 'error');
+                        }
+                    });
+            }
+        }
+
+        function testEmailService() {
+            addLog('🧪 Test: Service email...', 'info');
+
+            if (window.emailService) {
+                addLog('✅ EmailService chargé correctement', 'success');
+                addLog(`📧 Email cible: ${window.emailService.notificationEmail}`, 'info');
+                addLog(`🔗 Endpoint: ${window.emailService.emailEndpoint}`, 'info');
+
+                // Test de connectivité
+                fetch(window.emailService.emailEndpoint, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                }).then(() => {
+                    addLog('✅ Endpoint accessible', 'success');
+                }).catch(() => {
+                    addLog('⚠️ Endpoint non accessible ou CORS bloqué', 'error');
+                });
+
+            } else {
+                addLog('❌ EmailService non disponible', 'error');
+            }
+        }
+
+        function showStoredData() {
+            addLog('📊 Affichage des données stockées...', 'info');
+
+            const visitors = JSON.parse(localStorage.getItem('portfolio-visitors') || '[]');
+            const actions = JSON.parse(localStorage.getItem('portfolio-actions') || '[]');
+            const pendingEmails = JSON.parse(localStorage.getItem('pending-emails') || '[]');
+
+            addLog(`👥 Visiteurs: ${visitors.length}`, 'info');
+            addLog(`🎯 Actions: ${actions.length}`, 'info');
+            addLog(`📧 Emails en attente: ${pendingEmails.length}`, 'info');
+
+            if (visitors.length > 0) {
+                addLog(`📅 Dernière visite: ${visitors[visitors.length - 1].timestamp}`, 'info');
+            }
+
+            console.log('Visiteurs:', visitors);
+            console.log('Actions:', actions);
+            console.log('Emails en attente:', pendingEmails);
+        }
+
+        function clearStoredData() {
+            localStorage.removeItem('portfolio-visitors');
+            localStorage.removeItem('portfolio-actions');
+            localStorage.removeItem('pending-emails');
+            addLog('🗑️ Toutes les données locales ont été effacées', 'info');
+        }
+
+        function exportData() {
+            const data = {
+                visitors: JSON.parse(localStorage.getItem('portfolio-visitors') || '[]'),
+                actions: JSON.parse(localStorage.getItem('portfolio-actions') || '[]'),
+                pendingEmails: JSON.parse(localStorage.getItem('pending-emails') || '[]'),
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `portfolio-data-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            addLog('💾 Données exportées en JSON', 'success');
+        }
+
+        function clearLogs() {
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '<div class="info">🚀 Logs effacés...</div>';
+        }
+
+        function configureFormspree() {
+            const formspreeId = document.getElementById('formspree-id').value;
+            if (formspreeId && window.emailService) {
+                window.emailService.emailEndpoint = `https://formspree.io/f/${formspreeId}`;
+                addLog(`⚙️ Formspree configuré: ${formspreeId}`, 'success');
+                updateConfigDisplay();
+            } else {
+                addLog('❌ Veuillez entrer un Form ID valide', 'error');
+            }
+        }
+
+        function updateConfigDisplay() {
+            if (window.emailService) {
+                document.getElementById('formspree-endpoint').textContent = window.emailService.emailEndpoint;
+                document.getElementById('email-service').textContent = 'EmailService chargé ✅';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🔄 Page de test chargée', 'info');
+
+            setTimeout(() => {
+                if (window.emailService) {
+                    addLog('✅ EmailService détecté et chargé', 'success');
+                    updateConfigDisplay();
+                } else {
+                    addLog('❌ EmailService non chargé - Vérifiez emailService.js', 'error');
+                }
+            }, 500);
+        });
+
+        // Global error handler
+        window.onerror = function(message, source, lineno, colno, error) {
+            addLog(`💥 Erreur JavaScript: ${message} (ligne ${lineno})`, 'error');
+        };
+    </script>
+</body>
+</html>
