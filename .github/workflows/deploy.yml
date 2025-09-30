@@ -38,17 +38,29 @@ jobs:
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 
+      - name: Show original config file
+        run: |
+          echo "=== Contenu original du fichier config ==="
+          cat currentFolio/web3forms-config.js
+          echo "=== Fin du contenu original ==="
+
       - name: Build with secret
         run: |
           echo "Building site with WEB3FORMS configuration..."
-          # Vérifier que le répertoire existe
-          ls -la currentFolio/
-          # Injecter la clé Web3Forms dans le fichier JavaScript
-          echo "window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';" > currentFolio/web3forms-config.js
+          # Backup du fichier original
+          cp currentFolio/web3forms-config.js currentFolio/web3forms-config.js.backup
+
+          # Créer le nouveau fichier avec la vraie clé
+          cat > currentFolio/web3forms-config.js << EOF
+// Configuration Web3Forms - Clé injectée automatiquement lors du déploiement
+window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';
+EOF
+
           echo "Configuration Web3Forms injectée avec succès"
           # Vérifier le contenu
-          echo "Contenu du fichier généré:"
+          echo "=== Nouveau contenu du fichier ==="
           cat currentFolio/web3forms-config.js
+          echo "=== Fin du nouveau contenu ==="
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 
