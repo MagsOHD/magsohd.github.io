@@ -2,7 +2,7 @@
 class EmailService {
     constructor() {
         // Web3Forms - Entièrement gratuit et open source
-        this.web3formsKey = process.env.WEB3FORMSKEY;
+        this.web3formsKey = typeof window !== 'undefined' && window.WEB3FORMSKEY ? window.WEB3FORMSKEY : 'YOUR_WEB3FORMS_KEY';
         this.notificationEmail = 'lucas.bracq.pro@gmail.com';
 
         // Configuration des timeouts et retry

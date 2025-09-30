@@ -1,10 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Run app with secret
-        run: node index.js
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Build with secret
+        run: |
+          echo "Building site with WEB3FORMS configuration..."
+          # Injecter la clé Web3Forms dans le fichier JavaScript
+          echo "window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';" > currentFolio/web3forms-config.js
+          echo "Configuration Web3Forms injectée avec succès"
         env:
-          github-pages: ${{ secrets.WEB3FORMSKEY }}
+          WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
