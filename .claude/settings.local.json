@@ -3,7 +3,8 @@
     "allow": [
       "Bash(start \"Test Email System\" \"C:\\Users\\Lucas\\Desktop\\Développement\\Projects\\magsohd.github.io\\currentFolio\\test-auto-email.html\")",
       "Bash(start \"Test Email System - Fixed\" \"C:\\Users\\Lucas\\Desktop\\Développement\\Projects\\magsohd.github.io\\currentFolio\\test-auto-email.html\")",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
