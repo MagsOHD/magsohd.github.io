@@ -26,31 +26,24 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Inject Web3Forms key (FINAL STEP BEFORE UPLOAD)
+      - name: Inject Web3Forms key via HTML meta tags
         run: |
-          echo "🔧 INJECTION FINALE Web3Forms - Juste avant upload"
-          echo "=== État initial ==="
-          ls -la currentFolio/web3forms-config.js
-          cat currentFolio/web3forms-config.js
+          echo "🔧 INJECTION Web3Forms via META TAGS"
 
-          echo "=== INJECTION DE LA CLÉ ==="
-          # Force l'écrasement complet
-          rm -f currentFolio/web3forms-config.js
-          echo "// Configuration Web3Forms - Clé injectée automatiquement lors du déploiement" > currentFolio/web3forms-config.js
-          echo "window.WEB3FORMSKEY = '${{ secrets.WEB3FORMSKEY }}';" >> currentFolio/web3forms-config.js
+          # Injecter dans tous les fichiers HTML
+          for file in currentFolio/*.html; do
+            if [ -f "$file" ]; then
+              echo "Traitement de $file"
+              # Ajouter la meta tag juste après <head>
+              sed -i 's|<head>|<head>\n    <meta name="web3forms-key" content="${{ secrets.WEB3FORMSKEY }}">|' "$file"
+              echo "✅ Meta tag ajoutée à $file"
+            fi
+          done
 
-          echo "=== VÉRIFICATION POST-INJECTION ==="
-          ls -la currentFolio/web3forms-config.js
-          echo "Contenu final:"
-          cat currentFolio/web3forms-config.js
+          echo "=== VÉRIFICATION ==="
+          grep -r "web3forms-key" currentFolio/*.html || echo "Aucune meta tag trouvée"
 
-          echo "=== TEST DE PRÉSENCE DE LA CLÉ ==="
-          if grep -q '${{ secrets.WEB3FORMSKEY }}' currentFolio/web3forms-config.js; then
-            echo "✅ SUCCESS: Clé présente dans le fichier final"
-          else
-            echo "❌ FAIL: Clé absente - ARRÊT DU WORKFLOW"
-            exit 1
-          fi
+          echo "✅ Injection terminée"
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 

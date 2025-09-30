@@ -2,12 +2,41 @@
 class EmailService {
     constructor() {
         // Web3Forms - Entièrement gratuit et open source
-        this.web3formsKey = typeof window !== 'undefined' && window.WEB3FORMSKEY ? window.WEB3FORMSKEY : 'YOUR_WEB3FORMS_KEY';
+        // Multiple sources pour la clé
+        this.web3formsKey = this.getWeb3FormsKey();
         this.notificationEmail = 'lucas.bracq.pro@gmail.com';
 
         // Configuration des timeouts et retry
         this.fetchTimeout = 10000; // 10 secondes
         this.maxRetries = 3;
+    }
+
+    // Récupérer la clé Web3Forms depuis plusieurs sources
+    getWeb3FormsKey() {
+        // Source 1: Variable globale injectée par le workflow
+        if (typeof window !== 'undefined' && window.WEB3FORMSKEY && window.WEB3FORMSKEY !== 'YOUR_WEB3FORMS_KEY') {
+            console.log('🔑 Clé Web3Forms trouvée via window.WEB3FORMSKEY');
+            return window.WEB3FORMSKEY;
+        }
+
+        // Source 2: Meta tag injecté par le workflow
+        if (typeof document !== 'undefined') {
+            const metaKey = document.querySelector('meta[name="web3forms-key"]');
+            if (metaKey && metaKey.content && metaKey.content !== 'YOUR_WEB3FORMS_KEY') {
+                console.log('🔑 Clé Web3Forms trouvée via meta tag');
+                return metaKey.content;
+            }
+        }
+
+        // Source 3: Variable d'environnement injectée dans le HTML
+        if (typeof window !== 'undefined' && window.WEB3FORMS_CONFIG && window.WEB3FORMS_CONFIG.key) {
+            console.log('🔑 Clé Web3Forms trouvée via WEB3FORMS_CONFIG');
+            return window.WEB3FORMS_CONFIG.key;
+        }
+
+        // Fallback: placeholder pour développement local
+        console.warn('⚠️ Utilisation du placeholder Web3Forms - fonctionnalité limitée');
+        return 'YOUR_WEB3FORMS_KEY';
     }
 
     // Envoyer notification de visite
