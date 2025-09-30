@@ -1,2 +1,2 @@
-// Configuration Web3Forms - TEST CACHE TIMESTAMP 2025-10-01-22:20
+// Configuration Web3Forms - Cette clé sera remplacée automatiquement lors du déploiement
 window.WEB3FORMSKEY = 'YOUR_WEB3FORMS_KEY';
