@@ -30,20 +30,44 @@ jobs:
         run: |
           echo "🔧 INJECTION Web3Forms via META TAGS"
 
-          # Injecter dans tous les fichiers HTML
+          # Test si les fichiers existent
+          ls -la currentFolio/*.html
+
+          # Injecter dans tous les fichiers HTML avec une méthode plus robuste
           for file in currentFolio/*.html; do
             if [ -f "$file" ]; then
-              echo "Traitement de $file"
-              # Ajouter la meta tag juste après <head>
-              sed -i 's|<head>|<head>\n    <meta name="web3forms-key" content="${{ secrets.WEB3FORMSKEY }}">|' "$file"
+              echo "=== Traitement de $file ==="
+              echo "Contenu avant injection (premières lignes):"
+              head -10 "$file"
+
+              # Créer un fichier temporaire avec l'injection
+              awk -v key="${{ secrets.WEB3FORMSKEY }}" '
+              /<head>/ {
+                print $0
+                print "    <meta name=\"web3forms-key\" content=\"" key "\">"
+                next
+              }
+              { print }
+              ' "$file" > "$file.tmp"
+
+              # Remplacer le fichier original
+              mv "$file.tmp" "$file"
+
+              echo "Contenu après injection (premières lignes):"
+              head -10 "$file"
               echo "✅ Meta tag ajoutée à $file"
             fi
           done
 
-          echo "=== VÉRIFICATION ==="
-          grep -r "web3forms-key" currentFolio/*.html || echo "Aucune meta tag trouvée"
+          echo "=== VÉRIFICATION FINALE ==="
+          if grep -r "web3forms-key" currentFolio/*.html; then
+            echo "✅ Meta tags trouvées dans les fichiers HTML"
+          else
+            echo "❌ ERREUR: Aucune meta tag trouvée - ARRÊT"
+            exit 1
+          fi
 
-          echo "✅ Injection terminée"
+          echo "✅ Injection terminée avec succès"
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
 
