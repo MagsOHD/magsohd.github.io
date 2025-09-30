@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Final Web3Forms</title>
+    <meta name="web3forms-key" content="YOUR_WEB3FORMS_KEY_PLACEHOLDER">
+    <style>
+        body { font-family: monospace; background: #0a0a0a; color: #00fff9; padding: 20px; }
+        button { background: transparent; border: 2px solid #00fff9; color: #00fff9; padding: 10px 20px; margin: 10px; cursor: pointer; }
+        button:hover { background: #00fff9; color: #0a0a0a; }
+        .status { margin: 20px 0; padding: 15px; border: 1px solid #00fff9; }
+        .success { color: #39ff14; }
+        .error { color: #ff6b00; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Final Web3Forms</h1>
+
+    <button onclick="testMetaTag()">🔍 Tester Meta Tag</button>
+    <button onclick="testGlobalVar()">🌐 Tester Variable Globale</button>
+    <button onclick="testEmailService()">📧 Tester Service Email</button>
+
+    <div id="status" class="status">
+        Cliquez sur un bouton pour tester...
+    </div>
+
+    <script src="emailService.js"></script>
+    <script>
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.className = `status ${type}`;
+        }
+
+        function testMetaTag() {
+            const metaTag = document.querySelector('meta[name="web3forms-key"]');
+            if (metaTag && metaTag.content !== 'YOUR_WEB3FORMS_KEY_PLACEHOLDER') {
+                updateStatus(`✅ Meta tag trouvée: ${metaTag.content.substring(0, 8)}...`, 'success');
+            } else {
+                updateStatus('❌ Meta tag non trouvée ou contient le placeholder', 'error');
+            }
+        }
+
+        function testGlobalVar() {
+            if (window.WEB3FORMSKEY && window.WEB3FORMSKEY !== 'YOUR_WEB3FORMS_KEY') {
+                updateStatus(`✅ Variable globale: ${window.WEB3FORMSKEY.substring(0, 8)}...`, 'success');
+            } else {
+                updateStatus('❌ Variable globale non configurée', 'error');
+            }
+        }
+
+        function testEmailService() {
+            if (window.emailService) {
+                const key = window.emailService.web3formsKey;
+                if (key && key !== 'YOUR_WEB3FORMS_KEY') {
+                    updateStatus(`✅ EmailService configuré: ${key.substring(0, 8)}...`, 'success');
+                } else {
+                    updateStatus('❌ EmailService utilise le placeholder', 'error');
+                }
+            } else {
+                updateStatus('❌ EmailService non disponible', 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            console.log('🔍 Diagnostic automatique:');
+            console.log('Meta tag:', document.querySelector('meta[name="web3forms-key"]'));
+            console.log('Variable globale:', window.WEB3FORMSKEY);
+            console.log('EmailService key:', window.emailService?.web3formsKey);
+        });
+    </script>
+</body>
+</html>

@@ -67,6 +67,14 @@ jobs:
             exit 1
           fi
 
+          # SOLUTION DE SECOURS: Remplacer le placeholder dans test-final.html
+          echo "=== SOLUTION DE SECOURS ==="
+          if [ -f "currentFolio/test-final.html" ]; then
+            sed -i 's/YOUR_WEB3FORMS_KEY_PLACEHOLDER/${{ secrets.WEB3FORMSKEY }}/g' currentFolio/test-final.html
+            echo "✅ Placeholder remplacé dans test-final.html"
+            grep "web3forms-key" currentFolio/test-final.html
+          fi
+
           echo "✅ Injection terminée avec succès"
         env:
           WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
