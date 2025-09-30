@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Web3Forms</title>
+    <style>
+        body { font-family: monospace; background: #0a0a0a; color: #00fff9; padding: 20px; }
+        button { background: transparent; border: 2px solid #00fff9; color: #00fff9; padding: 10px 20px; margin: 10px; cursor: pointer; }
+        button:hover { background: #00fff9; color: #0a0a0a; }
+        .status { margin: 20px 0; padding: 15px; border: 1px solid #00fff9; }
+        .success { color: #39ff14; }
+        .error { color: #ff6b00; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Rapide Web3Forms</h1>
+
+    <button onclick="testConfig()">🔑 Tester Configuration</button>
+    <button onclick="testEmail()">📧 Tester Envoi Email</button>
+
+    <div id="status" class="status">
+        Cliquez sur un bouton pour tester...
+    </div>
+
+    <script src="web3forms-config.js"></script>
+    <script src="emailService.js"></script>
+    <script>
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.className = `status ${type}`;
+        }
+
+        function testConfig() {
+            updateStatus('🔍 Test de la configuration...', 'info');
+
+            if (window.WEB3FORMSKEY && window.WEB3FORMSKEY !== 'YOUR_WEB3FORMS_KEY') {
+                updateStatus(`✅ Clé Web3Forms configurée: ${window.WEB3FORMSKEY.substring(0, 8)}...`, 'success');
+            } else {
+                updateStatus('❌ Clé Web3Forms non configurée (placeholder détecté)', 'error');
+            }
+        }
+
+        async function testEmail() {
+            updateStatus('📧 Test d\'envoi d\'email...', 'info');
+
+            try {
+                if (!window.emailService) {
+                    throw new Error('EmailService non disponible');
+                }
+
+                const result = await window.emailService.testEmailSending();
+
+                if (result.success) {
+                    updateStatus('✅ Email de test envoyé avec succès!', 'success');
+                } else {
+                    updateStatus(`❌ Échec envoi: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
