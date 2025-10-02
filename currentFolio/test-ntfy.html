@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ntfy.sh - Notifications Portfolio</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00fff9;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 255, 249, 0.05);
+            border: 2px solid #00fff9;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 249, 0.3);
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .test-title {
+            color: #ff6b00;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .test-btn {
+            background: transparent;
+            border: 2px solid #39ff14;
+            color: #39ff14;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .test-btn:hover {
+            background: #39ff14;
+            color: #0a0a0a;
+            box-shadow: 0 0 15px #39ff14;
+        }
+
+        .log-container {
+            background: #000;
+            border: 1px solid #00fff9;
+            padding: 15px;
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00fff9;
+            padding-left: 10px;
+        }
+
+        .log-success {
+            border-left-color: #39ff14;
+            color: #39ff14;
+        }
+
+        .log-error {
+            border-left-color: #ff0040;
+            color: #ff0040;
+        }
+
+        .log-warning {
+            border-left-color: #ff6b00;
+            color: #ff6b00;
+        }
+
+        .config-display {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .topic-input {
+            background: rgba(0, 255, 249, 0.1);
+            border: 1px solid #00fff9;
+            color: #00fff9;
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online { background: #39ff14; }
+        .status-offline { background: #ff0040; }
+        .status-unknown { background: #ff6b00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Test ntfy.sh - Système de Notifications</h1>
+
+        <!-- Configuration Section -->
+        <div class="test-section">
+            <div class="test-title">📋 Configuration actuelle</div>
+            <div id="config-display" class="config-display">
+                Chargement de la configuration...
+            </div>
+            <input type="text" id="topic-input" class="topic-input"
+                   placeholder="Entrez votre topic ntfy.sh (ex: mon-portfolio-notifications)">
+            <button class="test-btn" onclick="updateTopic()">Mettre à jour le topic</button>
+        </div>
+
+        <!-- Test Buttons -->
+        <div class="test-section">
+            <div class="test-title">🧪 Tests de notification</div>
+            <button class="test-btn" onclick="testBasicNotification()">Test notification basique</button>
+            <button class="test-btn" onclick="testVisitorNotification()">Test notification visiteur</button>
+            <button class="test-btn" onclick="testActionNotification()">Test notification action</button>
+            <button class="test-btn" onclick="testContactNotification()">Test notification contact</button>
+        </div>
+
+        <!-- Advanced Tests -->
+        <div class="test-section">
+            <div class="test-title">⚙️ Tests avancés</div>
+            <button class="test-btn" onclick="testDifferentPriorities()">Test différentes priorités</button>
+            <button class="test-btn" onclick="testWithActions()">Test avec actions</button>
+            <button class="test-btn" onclick="validateConfiguration()">Valider configuration</button>
+            <button class="test-btn" onclick="clearLogs()">Effacer logs</button>
+        </div>
+
+        <!-- Status Section -->
+        <div class="test-section">
+            <div class="test-title">📊 Statut du service</div>
+            <div id="service-status">
+                <span class="status-indicator status-unknown"></span>
+                Vérification en cours...
+            </div>
+        </div>
+
+        <!-- Log Display -->
+        <div class="test-section">
+            <div class="test-title">📝 Logs en temps réel</div>
+            <div id="log-container" class="log-container">
+                <div class="log-entry">🚀 Système de test ntfy.sh initialisé</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="ntfy-config.js"></script>
+    <script src="emailService.js"></script>
+
+    <script>
+        let logCount = 0;
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+
+            logCount++;
+            if (logCount > 100) {
+                logContainer.removeChild(logContainer.firstChild);
+                logCount--;
+            }
+        }
+
+        // Update configuration display
+        function updateConfigDisplay() {
+            const configDiv = document.getElementById('config-display');
+            const config = window.emailService ? window.emailService.checkConfiguration() : null;
+
+            if (config) {
+                configDiv.innerHTML = `
+                    <strong>Topic ntfy.sh:</strong> ${window.emailService.ntfyTopic}<br>
+                    <strong>Serveur:</strong> ${window.emailService.ntfyServer}<br>
+                    <strong>Fetch disponible:</strong> ${config.fetch ? '✅' : '❌'}<br>
+                    <strong>Connexion internet:</strong> ${config.online ? '✅' : '❌'}<br>
+                    <strong>Topic configuré:</strong> ${config.ntfy ? '✅' : '❌'}
+                `;
+            } else {
+                configDiv.innerHTML = '❌ Service non disponible';
+            }
+        }
+
+        // Update service status
+        function updateServiceStatus() {
+            const statusDiv = document.getElementById('service-status');
+            const isOnline = navigator.onLine;
+            const hasService = window.emailService !== undefined;
+
+            if (hasService && isOnline) {
+                statusDiv.innerHTML = '<span class="status-indicator status-online"></span>Service ntfy.sh opérationnel';
+            } else if (!isOnline) {
+                statusDiv.innerHTML = '<span class="status-indicator status-offline"></span>Pas de connexion internet';
+            } else {
+                statusDiv.innerHTML = '<span class="status-indicator status-offline"></span>Service indisponible';
+            }
+        }
+
+        // Update topic
+        function updateTopic() {
+            const newTopic = document.getElementById('topic-input').value.trim();
+            if (!newTopic) {
+                addLog('❌ Veuillez entrer un topic valide', 'error');
+                return;
+            }
+
+            if (window.emailService) {
+                window.emailService.ntfyTopic = newTopic;
+                window.NTFY_TOPIC = newTopic;
+                addLog(`✅ Topic mis à jour: ${newTopic}`, 'success');
+                updateConfigDisplay();
+            } else {
+                addLog('❌ Service email non disponible', 'error');
+            }
+        }
+
+        // Test basic notification
+        async function testBasicNotification() {
+            addLog('🔔 Test notification basique...', 'info');
+
+            try {
+                const result = await window.emailService.sendViaNtfy(
+                    '🧪 Test Notification',
+                    'Ceci est un test de notification basique depuis votre portfolio cyberpunk.',
+                    { testType: 'basic', timestamp: new Date().toISOString() }
+                );
+
+                if (result.success) {
+                    addLog('✅ Notification basique envoyée avec succès!', 'success');
+                } else {
+                    addLog('❌ Échec de l\'envoi de la notification basique', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test visitor notification
+        async function testVisitorNotification() {
+            addLog('👁️ Test notification visiteur...', 'info');
+
+            try {
+                const visitorData = {
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    referrer: 'test-ntfy.html'
+                };
+
+                const result = await window.emailService.sendVisitorNotification(visitorData);
+
+                if (result.success) {
+                    addLog('✅ Notification visiteur envoyée avec succès!', 'success');
+                } else {
+                    addLog('❌ Échec de l\'envoi de la notification visiteur', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test action notification
+        async function testActionNotification() {
+            addLog('🎯 Test notification action...', 'info');
+
+            try {
+                const actionData = {
+                    action: 'hire_protocol',
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    language: navigator.language
+                };
+
+                const result = await window.emailService.sendActionNotification(actionData);
+
+                if (result.success) {
+                    addLog('✅ Notification action envoyée avec succès!', 'success');
+                } else {
+                    addLog('❌ Échec de l\'envoi de la notification action', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test contact notification
+        async function testContactNotification() {
+            addLog('📧 Test notification contact...', 'info');
+
+            try {
+                const contactData = {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    company: 'Test Company',
+                    message: 'Ceci est un message de test depuis le système ntfy.sh',
+                    timestamp: new Date().toISOString()
+                };
+
+                const result = await window.emailService.sendContactNotification(contactData);
+
+                if (result.success) {
+                    addLog('✅ Notification contact envoyée avec succès!', 'success');
+                } else {
+                    addLog('❌ Échec de l\'envoi de la notification contact', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test different priorities
+        async function testDifferentPriorities() {
+            addLog('⚡ Test des différentes priorités...', 'info');
+
+            const priorities = [
+                { level: 'min', emoji: '🔕', subject: 'Test Priorité Minimale' },
+                { level: 'low', emoji: '🔔', subject: 'Test Priorité Basse' },
+                { level: 'default', emoji: '🔔', subject: 'Test Priorité Normale' },
+                { level: 'high', emoji: '🚨', subject: 'Test Priorité Haute' },
+                { level: 'max', emoji: '🆘', subject: 'Test Priorité Maximale' }
+            ];
+
+            for (const priority of priorities) {
+                try {
+                    await window.emailService.sendViaNtfy(
+                        `${priority.emoji} ${priority.subject}`,
+                        `Test de notification avec priorité ${priority.level}`,
+                        { testType: 'priority', priority: priority.level }
+                    );
+                    addLog(`✅ Notification priorité ${priority.level} envoyée`, 'success');
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Délai entre envois
+                } catch (error) {
+                    addLog(`❌ Erreur priorité ${priority.level}: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Test with actions
+        async function testWithActions() {
+            addLog('🎬 Test notification avec actions...', 'info');
+
+            try {
+                const response = await fetch(`${window.emailService.ntfyServer}/${window.emailService.ntfyTopic}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'Title': 'Test avec Actions',
+                        'Priority': '4',
+                        'Tags': 'portfolio,test,actions',
+                        'Actions': 'view, Voir Portfolio, https://magsohd.github.io/currentFolio/, clear=true; http, Telecharger CV, https://example.com/cv.pdf'
+                    },
+                    body: '🎬 Test avec Actions\n\nCette notification contient des boutons d\'action interactifs!'
+                });
+
+                if (response.ok) {
+                    addLog('✅ Notification avec actions envoyée!', 'success');
+                } else {
+                    addLog('❌ Échec de l\'envoi avec actions', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Validate configuration
+        async function validateConfiguration() {
+            addLog('🔍 Validation de la configuration...', 'info');
+
+            try {
+                const result = await window.emailService.validateNtfyTopic();
+
+                if (result.valid) {
+                    addLog('✅ Configuration valide! Topic accessible.', 'success');
+                } else {
+                    addLog(`❌ Configuration invalide: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erreur de validation: ${error.message}`, 'error');
+            }
+        }
+
+        // Clear logs
+        function clearLogs() {
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '<div class="log-entry">🧹 Logs effacés</div>';
+            logCount = 1;
+            addLog('🚀 Prêt pour de nouveaux tests', 'info');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🔧 Initialisation du système de test...', 'info');
+
+            setTimeout(() => {
+                updateConfigDisplay();
+                updateServiceStatus();
+                addLog('✅ Système de test prêt!', 'success');
+
+                // Set default topic in input
+                if (window.emailService && window.emailService.ntfyTopic) {
+                    document.getElementById('topic-input').value = window.emailService.ntfyTopic;
+                }
+            }, 1000);
+        });
+
+        // Update status on connectivity change
+        window.addEventListener('online', () => {
+            updateServiceStatus();
+            addLog('🌐 Connexion internet rétablie', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            updateServiceStatus();
+            addLog('❌ Connexion internet perdue', 'error');
+        });
+    </script>
+</body>
+</html>

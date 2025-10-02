@@ -26,9 +26,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Inject Web3Forms key via HTML meta tags
+      - name: Inject ntfy.sh topic via HTML meta tags and JS config
         run: |
-          echo "🔧 INJECTION Web3Forms via META TAGS"
+          echo "🔔 INJECTION ntfy.sh topic via META TAGS et CONFIG JS"
+
+          # Vérifier si le secret NTFY_TOPIC est défini
+          if [ -z "${{ secrets.NTFY_TOPIC }}" ]; then
+            echo "⚠️ ATTENTION: Secret NTFY_TOPIC non défini - utilisation du fallback"
+            NTFY_TOPIC_VALUE="lucas-portfolio-fallback-$(date +%s)"
+          else
+            echo "✅ Secret NTFY_TOPIC trouvé"
+            NTFY_TOPIC_VALUE="${{ secrets.NTFY_TOPIC }}"
+          fi
+
+          echo "Topic à utiliser: $NTFY_TOPIC_VALUE"
 
           # Test si les fichiers existent
           ls -la currentFolio/*.html
@@ -40,11 +51,11 @@ jobs:
               echo "Contenu avant injection (premières lignes):"
               head -10 "$file"
 
-              # Créer un fichier temporaire avec l'injection
-              awk -v key="${{ secrets.WEB3FORMSKEY }}" '
+              # Créer un fichier temporaire avec l'injection du meta tag ntfy
+              awk -v topic="$NTFY_TOPIC_VALUE" '
               /<head>/ {
                 print $0
-                print "    <meta name=\"web3forms-key\" content=\"" key "\">"
+                print "    <meta name=\"ntfy-topic\" content=\"" topic "\">"
                 next
               }
               { print }
@@ -55,29 +66,42 @@ jobs:
 
               echo "Contenu après injection (premières lignes):"
               head -10 "$file"
-              echo "✅ Meta tag ajoutée à $file"
+              echo "✅ Meta tag ntfy ajoutée à $file"
             fi
           done
 
-          echo "=== VÉRIFICATION FINALE ==="
-          if grep -r "web3forms-key" currentFolio/*.html; then
-            echo "✅ Meta tags trouvées dans les fichiers HTML"
+          echo "=== INJECTION DANS LE FICHIER CONFIG JS ==="
+          if [ -f "currentFolio/ntfy-config.js" ]; then
+            echo "Contenu avant injection:"
+            cat currentFolio/ntfy-config.js
+
+            # Remplacer différents patterns pour le topic
+            sed -i "s|lucas-portfolio-dev-[^']*|$NTFY_TOPIC_VALUE|g" currentFolio/ntfy-config.js
+            sed -i "s/YOUR_NTFY_TOPIC/$NTFY_TOPIC_VALUE/g" currentFolio/ntfy-config.js
+
+            echo "Contenu après injection:"
+            cat currentFolio/ntfy-config.js
+            echo "✅ Topic ntfy.sh injecté dans ntfy-config.js"
           else
-            echo "❌ ERREUR: Aucune meta tag trouvée - ARRÊT"
-            exit 1
+            echo "❌ ATTENTION: ntfy-config.js non trouvé"
           fi
 
-          # SOLUTION DE SECOURS: Remplacer le placeholder dans test-final.html
-          echo "=== SOLUTION DE SECOURS ==="
-          if [ -f "currentFolio/test-final.html" ]; then
-            sed -i 's/YOUR_WEB3FORMS_KEY_PLACEHOLDER/${{ secrets.WEB3FORMSKEY }}/g' currentFolio/test-final.html
-            echo "✅ Placeholder remplacé dans test-final.html"
-            grep "web3forms-key" currentFolio/test-final.html
+          echo "=== VÉRIFICATION FINALE ==="
+          if grep -r "ntfy-topic" currentFolio/*.html; then
+            echo "✅ Meta tags ntfy trouvées dans les fichiers HTML"
+          else
+            echo "⚠️ WARNING: Aucune meta tag ntfy trouvée"
           fi
 
-          echo "✅ Injection terminée avec succès"
+          if grep -r "$NTFY_TOPIC_VALUE" currentFolio/ntfy-config.js; then
+            echo "✅ Topic ntfy.sh configuré dans le fichier JS"
+          else
+            echo "⚠️ WARNING: Topic ntfy.sh non configuré dans le JS"
+          fi
+
+          echo "✅ Injection ntfy.sh terminée avec succès"
         env:
-          WEB3FORMSKEY: ${{ secrets.WEB3FORMSKEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

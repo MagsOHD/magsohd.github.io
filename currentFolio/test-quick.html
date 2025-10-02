@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Web3Forms</title>
+    <title>Test ntfy.sh</title>
     <style>
         body { font-family: monospace; background: #0a0a0a; color: #00fff9; padding: 20px; }
         button { background: transparent; border: 2px solid #00fff9; color: #00fff9; padding: 10px 20px; margin: 10px; cursor: pointer; }
@@ -12,16 +12,16 @@
     </style>
 </head>
 <body>
-    <h1>🧪 Test Rapide Web3Forms</h1>
+    <h1>🔔 Test Rapide ntfy.sh</h1>
 
     <button onclick="testConfig()">🔑 Tester Configuration</button>
-    <button onclick="testEmail()">📧 Tester Envoi Email</button>
+    <button onclick="testEmail()">🔔 Tester Notification</button>
 
     <div id="status" class="status">
         Cliquez sur un bouton pour tester...
     </div>
 
-    <script src="web3forms-config.js"></script>
+    <script src="ntfy-config.js"></script>
     <script src="emailService.js"></script>
     <script>
         function updateStatus(message, type = 'info') {
@@ -33,15 +33,15 @@
         function testConfig() {
             updateStatus('🔍 Test de la configuration...', 'info');
 
-            if (window.WEB3FORMSKEY && window.WEB3FORMSKEY !== 'YOUR_WEB3FORMS_KEY') {
-                updateStatus(`✅ Clé Web3Forms configurée: ${window.WEB3FORMSKEY.substring(0, 8)}...`, 'success');
+            if (window.NTFY_TOPIC && window.NTFY_TOPIC !== 'YOUR_NTFY_TOPIC') {
+                updateStatus(`✅ Topic ntfy.sh configuré: ${window.NTFY_TOPIC}`, 'success');
             } else {
-                updateStatus('❌ Clé Web3Forms non configurée (placeholder détecté)', 'error');
+                updateStatus('❌ Topic ntfy.sh non configuré (placeholder détecté)', 'error');
             }
         }
 
         async function testEmail() {
-            updateStatus('📧 Test d\'envoi d\'email...', 'info');
+            updateStatus('🔔 Test d\'envoi de notification...', 'info');
 
             try {
                 if (!window.emailService) {

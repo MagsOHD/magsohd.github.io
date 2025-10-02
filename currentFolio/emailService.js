@@ -1,9 +1,9 @@
-// Service d'envoi d'emails GRATUIT et OPEN SOURCE pour les notifications
+// Service de notifications GRATUIT et OPEN SOURCE avec ntfy.sh
 class EmailService {
     constructor() {
-        // Web3Forms - Entièrement gratuit et open source
-        // Multiple sources pour la clé
-        this.web3formsKey = this.getWeb3FormsKey();
+        // ntfy.sh - Service de notifications gratuit et open source
+        this.ntfyTopic = this.getNtfyTopic();
+        this.ntfyServer = 'https://ntfy.sh';
         this.notificationEmail = 'lucas.bracq.pro@gmail.com';
 
         // Configuration des timeouts et retry
@@ -11,32 +11,42 @@ class EmailService {
         this.maxRetries = 3;
     }
 
-    // Récupérer la clé Web3Forms depuis plusieurs sources
-    getWeb3FormsKey() {
+    // Récupérer le topic ntfy.sh depuis plusieurs sources
+    getNtfyTopic() {
         // Source 1: Variable globale injectée par le workflow
-        if (typeof window !== 'undefined' && window.WEB3FORMSKEY && window.WEB3FORMSKEY !== 'YOUR_WEB3FORMS_KEY') {
-            console.log('🔑 Clé Web3Forms trouvée via window.WEB3FORMSKEY');
-            return window.WEB3FORMSKEY;
+        if (typeof window !== 'undefined' && window.NTFY_TOPIC &&
+            window.NTFY_TOPIC !== 'YOUR_NTFY_TOPIC' &&
+            !window.NTFY_TOPIC.includes('lucas-portfolio-dev-')) {
+            console.log('🔔 Topic ntfy.sh trouvé via window.NTFY_TOPIC (production)');
+            return window.NTFY_TOPIC;
         }
 
         // Source 2: Meta tag injecté par le workflow
         if (typeof document !== 'undefined') {
-            const metaKey = document.querySelector('meta[name="web3forms-key"]');
-            if (metaKey && metaKey.content && metaKey.content !== 'YOUR_WEB3FORMS_KEY') {
-                console.log('🔑 Clé Web3Forms trouvée via meta tag');
+            const metaKey = document.querySelector('meta[name="ntfy-topic"]');
+            if (metaKey && metaKey.content &&
+                metaKey.content !== 'YOUR_NTFY_TOPIC' &&
+                !metaKey.content.includes('lucas-portfolio-dev-')) {
+                console.log('🔔 Topic ntfy.sh trouvé via meta tag (production)');
                 return metaKey.content;
             }
         }
 
         // Source 3: Variable d'environnement injectée dans le HTML
-        if (typeof window !== 'undefined' && window.WEB3FORMS_CONFIG && window.WEB3FORMS_CONFIG.key) {
-            console.log('🔑 Clé Web3Forms trouvée via WEB3FORMS_CONFIG');
-            return window.WEB3FORMS_CONFIG.key;
+        if (typeof window !== 'undefined' && window.NTFY_CONFIG && window.NTFY_CONFIG.topic) {
+            console.log('🔔 Topic ntfy.sh trouvé via NTFY_CONFIG');
+            return window.NTFY_CONFIG.topic;
         }
 
-        // Fallback: placeholder pour développement local
-        console.warn('⚠️ Utilisation du placeholder Web3Forms - fonctionnalité limitée');
-        return 'YOUR_WEB3FORMS_KEY';
+        // Source 4: Variable globale avec fallback dev
+        if (typeof window !== 'undefined' && window.NTFY_TOPIC) {
+            console.log('🔔 Topic ntfy.sh trouvé via window.NTFY_TOPIC (développement)');
+            return window.NTFY_TOPIC;
+        }
+
+        // Fallback: topic par défaut pour développement local
+        console.warn('⚠️ Utilisation du topic ntfy.sh par défaut - notifications limitées');
+        return 'lucas-portfolio-notifications-' + Date.now().toString(36);
     }
 
     // Envoyer notification de visite
@@ -50,7 +60,7 @@ class EmailService {
             const subject = `🚨 Nouvelle visite sur votre portfolio cyberpunk`;
             const message = this.formatVisitorMessage(visitorData);
 
-            return await this.sendEmail(subject, message, 'visitor_notification', visitorData);
+            return await this.sendNotification(subject, message, 'visitor_notification', visitorData);
         } catch (error) {
             console.error('Erreur sendVisitorNotification:', error);
             return { success: false, error: error.message };
@@ -68,7 +78,7 @@ class EmailService {
             const subject = `🎯 Nouvelle interaction sur votre portfolio - ${actionData.action}`;
             const message = this.formatActionMessage(actionData);
 
-            return await this.sendEmail(subject, message, 'action_notification', actionData);
+            return await this.sendNotification(subject, message, 'action_notification', actionData);
         } catch (error) {
             console.error('Erreur sendActionNotification:', error);
             return { success: false, error: error.message };
@@ -86,92 +96,78 @@ class EmailService {
             const subject = `📧 Nouveau contact depuis votre portfolio`;
             const message = this.formatContactMessage(contactData);
 
-            return await this.sendEmail(subject, message, 'contact_notification', contactData);
+            return await this.sendNotification(subject, message, 'contact_notification', contactData);
         } catch (error) {
             console.error('Erreur sendContactNotification:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // Méthode principale d'envoi d'email avec fallbacks gratuits
-    async sendEmail(subject, message, type, data) {
+    // Méthode principale d'envoi de notification avec ntfy.sh
+    async sendNotification(subject, message, type, data) {
         try {
             const timestamp = new Date().toISOString();
 
             // Validation des paramètres
             if (!subject || !message || !type) {
-                throw new Error('Paramètres email manquants');
+                throw new Error('Paramètres notification manquants');
             }
 
-            console.log(`📧 Tentative d'envoi d'email: ${type}`);
+            console.log(`🔔 Tentative d'envoi de notification: ${type}`);
 
-            // Web3Forms - Service principal
-            const web3formsResult = await this.sendViaWeb3Forms(subject, message, data);
-            if (web3formsResult && web3formsResult.success) {
-                console.log('✅ Email envoyé avec succès via Web3Forms');
-                return { success: true, service: 'web3forms' };
+            // ntfy.sh - Service principal
+            const ntfyResult = await this.sendViaNtfy(subject, message, data);
+            if (ntfyResult && ntfyResult.success) {
+                console.log('✅ Notification envoyée avec succès via ntfy.sh');
+                return { success: true, service: 'ntfy' };
             } else {
-                console.error('❌ Échec de l\'envoi via Web3Forms');
-                return { success: false, service: 'web3forms', error: 'Échec Web3Forms' };
+                console.error('❌ Échec de l\'envoi via ntfy.sh');
+                return { success: false, service: 'ntfy', error: 'Échec ntfy.sh' };
             }
 
         } catch (error) {
-            console.error('Erreur critique dans sendEmail:', error);
+            console.error('Erreur critique dans sendNotification:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // Web3Forms - Service gratuit et open source
-    // Valider la configuration Web3Forms
-    async validateWeb3FormsKey() {
+    // ntfy.sh - Service gratuit et open source
+    // Valider la configuration ntfy.sh
+    async validateNtfyTopic() {
         try {
-            const response = await fetch('https://api.web3forms.com/submit', {
+            const testMessage = 'Test de validation du topic ntfy.sh';
+            const response = await fetch(`${this.ntfyServer}/${this.ntfyTopic}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Content-Type': 'text/plain',
+                    'Title': 'Test de validation',
+                    'Priority': '3',
+                    'Tags': 'test,validation'
                 },
-                body: JSON.stringify({
-                    access_key: this.web3formsKey,
-                    subject: 'Test de validation',
-                    email: this.notificationEmail,
-                    message: 'Test de validation de la clé Web3Forms',
-                    from_name: 'Test System'
-                })
+                body: testMessage
             });
 
-            const result = await response.json();
-            return { valid: result.success, message: result.message };
+            return { valid: response.ok, message: response.ok ? 'Topic valide' : 'Topic invalide' };
         } catch (error) {
             return { valid: false, message: error.message };
         }
     }
 
-    async sendViaWeb3Forms(subject, message, data) {
-        if (!this.web3formsKey || this.web3formsKey === 'YOUR_WEB3FORMS_ACCESS_KEY') {
-            throw new Error('Web3Forms non configuré - clé manquante');
+    async sendViaNtfy(subject, message, data) {
+        if (!this.ntfyTopic || this.ntfyTopic === 'YOUR_NTFY_TOPIC') {
+            console.error('❌ ntfy.sh non configuré - topic manquant');
+            throw new Error('ntfy.sh non configuré - topic manquant');
         }
 
-        // Vérifier que la clé semble valide (format UUID)
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(this.web3formsKey)) {
-            throw new Error('Clé Web3Forms invalide - format incorrect');
-        }
+        console.log('🔔 Tentative d\'envoi avec topic:', this.ntfyTopic);
 
         // Vérifier la connectivité internet
         if (!navigator.onLine) {
             throw new Error('Pas de connexion internet');
         }
 
-        const payload = {
-            access_key: this.web3formsKey,
-            name: 'Portfolio Cyberpunk Notification System',
-            email: this.notificationEmail,
-            subject: subject,
-            message: message
-        };
-
-        // Ajouter des informations supplémentaires dans le message
+        // Préparer le message complet avec métadonnées
+        let fullMessage = message;
         if (data) {
             const metadata = {
                 timestamp: new Date().toISOString(),
@@ -180,71 +176,86 @@ class EmailService {
                 ...data
             };
 
-            payload.message += '\n\n--- Informations techniques ---\n';
-            payload.message += `Timestamp: ${metadata.timestamp}\n`;
-            payload.message += `Page: ${metadata.pageUrl}\n`;
-            payload.message += `User Agent: ${metadata.userAgent}\n`;
+            fullMessage += '\n\n--- Informations techniques ---\n';
+            fullMessage += `Timestamp: ${metadata.timestamp}\n`;
+            fullMessage += `Page: ${metadata.pageUrl}\n`;
+            fullMessage += `User Agent: ${metadata.userAgent}\n`;
 
             // Ajouter d'autres données si disponibles
             if (data.screenResolution) {
-                payload.message += `Résolution: ${data.screenResolution}\n`;
+                fullMessage += `Résolution: ${data.screenResolution}\n`;
             }
             if (data.language) {
-                payload.message += `Langue: ${data.language}\n`;
+                fullMessage += `Langue: ${data.language}\n`;
             }
+        }
+
+        // Déterminer la priorité et les tags selon le type de notification
+        let priority = '3'; // Normal par défaut
+        let tags = 'portfolio';
+
+        // Nettoyer le subject des emojis pour les headers (garder uniquement le texte)
+        let cleanSubject = subject.replace(/[^\x00-\x7F]/g, "").trim();
+        if (!cleanSubject) {
+            cleanSubject = 'Notification Portfolio';
+        }
+
+        if (subject.includes('🚨') || subject.includes('visite')) {
+            priority = '4'; // High
+            tags = 'portfolio,visitor,new';
+        } else if (subject.includes('🎯') || subject.includes('interaction')) {
+            priority = '4'; // High
+            tags = 'portfolio,interaction,action';
+        } else if (subject.includes('📧') || subject.includes('contact')) {
+            priority = '5'; // Max
+            tags = 'portfolio,contact,important';
         }
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.fetchTimeout);
 
         try {
-            console.log('📤 Envoi Web3Forms avec payload:', JSON.stringify(payload, null, 2));
+            console.log('🔔 Envoi ntfy.sh vers topic:', this.ntfyTopic);
 
-            // Convertir en FormData pour une meilleure compatibilité Web3Forms
-            const formData = new FormData();
-            Object.keys(payload).forEach(key => {
-                formData.append(key, payload[key]);
-            });
-
-            const response = await fetch('https://api.web3forms.com/submit', {
+            const response = await fetch(`${this.ntfyServer}/${this.ntfyTopic}`, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'text/plain',
+                    'Title': cleanSubject,
+                    'Priority': priority,
+                    'Tags': tags,
+                    'Actions': 'view, Voir Portfolio, https://magsohd.github.io/currentFolio/, clear=true'
+                },
+                body: `${subject}\n\n${fullMessage}`,
                 signal: controller.signal
             });
 
             clearTimeout(timeoutId);
-            console.log('📥 Réponse Web3Forms status:', response.status, response.statusText);
+            console.log('📥 Réponse ntfy.sh status:', response.status, response.statusText);
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('❌ Erreur réponse Web3Forms:', errorText);
+                console.error('❌ Erreur réponse ntfy.sh:', errorText);
                 throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
             }
 
-            const result = await response.json();
-            console.log('📋 Résultat Web3Forms:', result);
+            console.log('✅ ntfy.sh succès confirmé');
+            return { success: true };
 
-            if (result.success) {
-                console.log('✅ Web3Forms succès confirmé');
-                return { success: true };
-            } else {
-                console.error('❌ Web3Forms échec:', result);
-                throw new Error(result.message || 'Erreur Web3Forms inconnue');
-            }
         } catch (error) {
             clearTimeout(timeoutId);
-            console.error('💥 Erreur Web3Forms complète:', error);
+            console.error('💥 Erreur ntfy.sh complète:', error);
 
             if (error.name === 'AbortError') {
-                throw new Error('Timeout Web3Forms (>10s)');
+                throw new Error('Timeout ntfy.sh (>10s)');
             }
 
             // Ajouter plus de détails sur l'erreur
             if (error.message.includes('Failed to fetch')) {
-                throw new Error('Erreur de connexion Web3Forms - Vérifiez votre connexion internet');
+                throw new Error('Erreur de connexion ntfy.sh - Vérifiez votre connexion internet');
             }
 
-            throw new Error(`Web3Forms: ${error.message}`);
+            throw new Error(`ntfy.sh: ${error.message}`);
         }
     }
 
@@ -364,18 +375,19 @@ Portfolio Cyberpunk - Lucas Bracq CyberDev`;
     // Vérifier la configuration avec validation
     checkConfiguration() {
         const config = {
-            web3forms: this.web3formsKey && this.web3formsKey !== this.web3formsKey,
+            ntfy: this.ntfyTopic && this.ntfyTopic !== 'YOUR_NTFY_TOPIC',
+            server: this.ntfyServer,
             fetch: typeof fetch !== 'undefined',
             online: navigator.onLine
         };
 
-        console.log('📋 Configuration Web3Forms:', config);
+        console.log('📋 Configuration ntfy.sh:', config);
         return config;
     }
 
-    // Test simple d'envoi d'email
-    async testEmailSending() {
-        console.log('🧪 Test d\'envoi d\'email simple...');
+    // Test simple d'envoi de notification
+    async testNotificationSending() {
+        console.log('🧪 Test d\'envoi de notification simple...');
 
         const testData = {
             timestamp: new Date().toISOString(),
